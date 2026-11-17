@@ -1,0 +1,12 @@
+# Projektregeln für die KI und lokale Dateien (nicht Teil der Abgabe)
+CLAUDE.md
+.claude/
+__pycache__/
+.DS_Store
+.venv/
+# Material, das nicht veröffentlicht werden soll
+5AHITS_VibeCoding.pdf
+*.docx
+# Quarto-Zwischendateien
+dokumentation_files/
+.quarto/

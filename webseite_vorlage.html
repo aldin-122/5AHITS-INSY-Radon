@@ -1,0 +1,1733 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Radon im Haus</title>
+<meta name="description" content="Radon-Messdaten eines Hauses in Mining (OÖ): Was ist Radon, wie kommt es ins Haus, was hilft – und was man davon in den Daten sieht.">
+<style>
+/* ---------- Farben und Grundwerte (helles, modernes Schema mit grünem Akzent) ---------- */
+:root {
+  color-scheme: light;
+  --seite: #f2f8f4; --flaeche: rgba(255,255,255,.88); --flaeche2: #f1f6f2; --flaeche3: #e2efe6;
+  --text: #14231a; --text2: #43554a; --leise: #6b7c71;
+  --raster: #e2eae4; --achse: #c3d0c7; --rand: rgba(20,70,40,.10);
+  --akzent: #13a05a; --akzent-dunkel: #0b7a42; --akzent-hell: #e3f5ea;
+  --schatten: 0 1px 2px rgba(20,70,40,.05), 0 10px 30px rgba(20,70,40,.07);
+  --blau: #2f6fd0; --orange: #d4561f; --aqua: #10917c; --gelb: #b07800;
+  --magenta: #c4407a; --gruen: #3a8f1f; --violett: #7563d9; --rot: #d64545;
+  --who: #c98a00; --at: #cf3434; --gut: #12893a;
+  --breit: min(1680px, 100%);
+  --rund: 14px;
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html { scroll-behavior: smooth; scroll-padding-top: 76px; }
+body { margin: 0; background: var(--seite); color: var(--text); font: 18px/1.6 system-ui, -apple-system, "Segoe UI", sans-serif; }
+a { color: var(--akzent-dunkel); }
+b, strong { color: var(--text); font-weight: 650; }
+h1, h2, h3, h4 { line-height: 1.2; margin: 0 0 .5em; }
+h2 { font-size: clamp(1.9rem, 3.2vw, 2.8rem); }
+h3 { font-size: clamp(1.35rem, 2vw, 1.75rem); }
+p { margin: 0 0 1em; }
+.leise { color: var(--leise); }
+.klein { font-size: .85rem; }
+
+/* ---------- Navigation ---------- */
+nav.oben { position: sticky; top: 0; z-index: 50; display: flex; align-items: center; gap: 28px; padding: 14px 4vw;
+  background: rgba(255,255,255,.72); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); border-bottom: 1px solid var(--rand); overflow-x: auto; }
+nav.oben .marke { font-weight: 700; white-space: nowrap; color: var(--text); text-decoration: none; }
+nav.oben .marke span { color: var(--akzent); }
+nav.oben .links { display: flex; gap: 6px; }
+nav.oben .links a { color: var(--text2); text-decoration: none; padding: 6px 14px; border-radius: 999px; white-space: nowrap; font-size: .95rem; }
+nav.oben .links a.aktiv, nav.oben .links a:hover { background: var(--flaeche3); color: var(--text); }
+#fortschritt { position: absolute; left: 0; bottom: -1px; height: 2px; background: var(--akzent); width: 0; }
+
+/* ---------- Abschnitte ---------- */
+section { padding: 72px 4vw; position: relative; z-index: 1; }
+section > .innen { max-width: var(--breit); margin: 0 auto; }
+.teil-kopf { display: flex; align-items: baseline; gap: 18px; margin-bottom: 18px; flex-wrap: wrap; }
+.teil-nr { color: var(--akzent); font-weight: 700; letter-spacing: .08em; text-transform: uppercase; font-size: .9rem; }
+.einleitung { font-size: 1.15rem; color: var(--text2); max-width: 80ch; }
+.trenner { border-top: 1px solid var(--rand); }
+
+/* ---------- Startbereich ---------- */
+.held { min-height: calc(100vh - 60px); display: flex; flex-direction: column; justify-content: center; padding-top: 40px;
+}
+.held > .innen { width: 100%; }
+.held h1 { font-size: clamp(2.6rem, 6vw, 5rem); max-width: 18ch; }
+.held h1 em { font-style: normal; background: linear-gradient(100deg, var(--akzent-dunkel), #3ccf7e); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.held .einleitung { font-size: clamp(1.1rem, 1.6vw, 1.4rem); }
+.kacheln { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 16px; margin: 36px 0 24px; }
+.kachel { background: var(--flaeche); border: 1px solid var(--rand); border-radius: var(--rund); padding: 22px 24px; box-shadow: var(--schatten); }
+.kachel .zahl { font-size: clamp(2.2rem, 3.4vw, 3.2rem); font-weight: 700; line-height: 1.05; }
+.kachel .zahl small { font-size: .45em; color: var(--text2); font-weight: 500; margin-left: 4px; }
+.kachel .text { color: var(--text2); margin-top: 6px; font-size: .98rem; }
+.weiter { display: inline-flex; gap: 10px; flex-wrap: wrap; }
+.knopf { display: inline-block; background: #fff; color: var(--text); border: 1px solid var(--rand); border-radius: 999px;
+  padding: 10px 20px; text-decoration: none; font: inherit; font-size: 1rem; cursor: pointer; }
+.knopf:hover { background: var(--flaeche3); }
+.knopf.haupt { background: var(--akzent); color: #fff; border-color: transparent; font-weight: 650; box-shadow: 0 6px 18px rgba(19,160,90,.28); }
+.knopf.haupt:hover { background: var(--akzent-dunkel); }
+
+/* ---------- Wissen (Fragen und Antworten) ---------- */
+.fragen { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(560px, 100%), 1fr)); gap: 16px; margin-top: 28px; align-items: start; }
+details.frage { background: var(--flaeche); border: 1px solid var(--rand); border-radius: var(--rund); box-shadow: var(--schatten); transition: border-color .2s; }
+details.frage:hover, details.frage[open] { border-color: rgba(19,160,90,.35); }
+details.frage > summary { list-style: none; cursor: pointer; padding: 20px 24px; font-size: 1.2rem; font-weight: 650; display: flex; gap: 14px; align-items: center; }
+details.frage > summary::-webkit-details-marker { display: none; }
+details.frage > summary .symbol { flex: none; width: 34px; height: 34px; border-radius: 50%; background: var(--akzent-hell); display: grid; place-items: center; color: var(--akzent-dunkel); font-size: 1rem; }
+details.frage > summary::after { content: "+"; margin-left: auto; color: var(--leise); font-size: 1.5rem; font-weight: 400; transition: transform .2s; }
+details.frage[open] > summary::after { transform: rotate(45deg); }
+details.frage .antwort { padding: 0 24px 22px; color: var(--text2); }
+details.frage .antwort b { color: var(--text); }
+/* Zugeklappt stehen alle Fragen in zwei Spalten. Breite Antworten nehmen erst aufgeklappt die ganze Zeile ein;
+   „dense“ füllt dabei entstehende Lücken mit den nächsten Fragen auf. */
+.fragen { grid-auto-flow: row dense; }
+details.frage.breit[open] { grid-column: 1 / -1; }
+.schritte { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 10px; margin: 14px 0; counter-reset: s; }
+.schritte div { background: var(--flaeche2); border-radius: 10px; padding: 14px; font-size: .95rem; }
+.schritte div::before { counter-increment: s; content: counter(s); display: inline-grid; place-items: center; width: 26px; height: 26px; border-radius: 50%; background: var(--akzent); color: #fff; font-weight: 700; margin-right: 8px; font-size: .85rem; }
+.boeden { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 12px; margin: 14px 0; }
+.boden { background: var(--flaeche2); border-radius: 10px; padding: 16px; }
+.boden h4 { color: var(--text); margin-bottom: 8px; }
+.skala { display: flex; align-items: center; gap: 8px; font-size: .88rem; margin: 4px 0; }
+.skala .punkte { display: flex; gap: 4px; margin-left: auto; }
+.skala .punkte i { width: 12px; height: 12px; border-radius: 50%; background: var(--achse); display: block; }
+.skala .punkte i.an { background: var(--akzent); }
+/* Weltkugel */
+.globus-karte { margin-top: 18px; }
+.globus-layout { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr); gap: 28px; align-items: center; }
+.globus-zeichen { position: relative; max-width: 640px; width: 100%; justify-self: center; }
+/* pan-y: auf dem Handy dreht waagrechtes Wischen die Kugel, senkrechtes scrollt weiter die Seite */
+.globus-zeichen canvas { width: 100%; aspect-ratio: 1; display: block; cursor: grab; touch-action: pan-y; }
+.globus-zeichen canvas.zieht { cursor: grabbing; }
+.globus-info { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; margin: 14px 0 6px; min-height: 3.2rem; }
+.globus-info .zahl { font-size: 2.4rem; font-weight: 750; line-height: 1; font-variant-numeric: tabular-nums; }
+.globus-info .name { font-weight: 650; font-size: 1.15rem; }
+.globus-skala { display: flex; align-items: center; gap: 10px; font-size: .85rem; color: var(--leise); margin: 10px 0; flex-wrap: wrap; }
+.globus-skala .verlauf { width: 200px; height: 10px; border-radius: 5px; background: linear-gradient(90deg, #fff3c4, #f6c453, #e8833a, #c0392b); }
+.globus-skala .keine { width: 14px; height: 10px; border-radius: 3px; background: #dfe5e1; display: inline-block; }
+.rangliste { display: grid; grid-template-columns: 1fr 1fr; gap: 4px 18px; font-size: .92rem; margin-top: 8px; }
+.rangliste div { display: flex; justify-content: space-between; border-bottom: 1px dashed var(--rand); padding: 2px 0; }
+.rangliste .titel { grid-column: span 1; font-weight: 650; border: 0; color: var(--text2); }
+/* Tabelle 100 gegen 300 */
+.tabelle { width: 100%; border-collapse: collapse; font-size: .95rem; margin: 10px 0; }
+.tabelle th, .tabelle td { padding: 8px 10px; text-align: right; border-bottom: 1px solid var(--rand); }
+.tabelle th:first-child, .tabelle td:first-child { text-align: left; }
+.tabelle thead th { color: var(--leise); font-weight: 600; font-size: .85rem; }
+.tabelle tr.who td:first-child { color: var(--who); font-weight: 650; }
+.tabelle tr.at td:first-child { color: var(--at); font-weight: 650; }
+/* Fazit auf den Punkt */
+.punkte-raster { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(320px, 100%), 1fr)); gap: 16px; margin-top: 24px; }
+.punkt-karte { background: var(--flaeche); border: 1px solid var(--rand); border-radius: var(--rund); padding: 20px 22px; box-shadow: var(--schatten); }
+.punkt-karte .frage-k { color: var(--akzent-dunkel); font-weight: 700; font-size: .85rem; letter-spacing: .05em; text-transform: uppercase; }
+.punkt-karte .gross { font-size: clamp(2rem, 3vw, 2.6rem); font-weight: 750; line-height: 1.1; margin: 8px 0 8px; font-variant-numeric: tabular-nums; }
+.punkt-karte .gross small { font-size: .45em; color: var(--text2); font-weight: 500; margin-left: 4px; }
+.punkt-karte p { color: var(--text2); margin: 0 0 6px; font-size: .97rem; }
+.punkt-karte.breit { grid-column: 1 / -1; }
+/* 5 schmale Karten ergeben 3 + 2: die letzte schmale Karte doppelt breit, damit keine Lücke bleibt (nur wenn ≥ 2 Spalten) */
+@media (min-width: 760px) { .punkt-karte.doppelt { grid-column: span 2; } }
+.punkt-karte .vier { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(250px, 100%), 1fr)); gap: 8px 24px; }
+@media (max-width: 1100px) { .globus-layout { grid-template-columns: 1fr; } .globus-zeichen { order: -1; max-width: 520px; } }
+@media (max-width: 640px) { .rangliste { gap: 4px 12px; font-size: .85rem; } .tabelle { font-size: .85rem; } .tabelle th, .tabelle td { padding: 6px 4px; } }
+.steckbrief { display: grid; gap: 8px; align-content: start; }
+.steckbrief div { display: flex; justify-content: space-between; gap: 16px; background: var(--flaeche2); border-radius: 10px; padding: 10px 14px; font-size: .95rem; }
+.steckbrief span { color: var(--leise); }
+.steckbrief b { text-align: right; }
+#alle-auf { margin-top: 4px; }
+.quellen { columns: 2 420px; font-size: .9rem; color: var(--leise); margin-top: 26px; }
+.quellen li { break-inside: avoid; margin-bottom: 4px; }
+figure { margin: 16px 0; }
+figure svg.schema { width: 100%; height: auto; display: block; }
+figcaption { color: var(--leise); font-size: .88rem; margin-top: 6px; }
+
+/* ---------- Diagramme ---------- */
+.diagramm { position: relative; }
+.diagramm .zeichen { position: relative; width: 100%; }
+.diagramm svg { display: block; width: 100%; overflow: visible; }
+.legende { display: flex; flex-wrap: wrap; gap: 6px 8px; margin-bottom: 8px; }
+.leg-eintrag { display: inline-flex; align-items: center; gap: 8px; background: transparent; border: 1px solid var(--rand); color: var(--text2);
+  border-radius: 999px; padding: 5px 12px; font: inherit; font-size: .9rem; cursor: pointer; }
+.leg-eintrag[aria-pressed="false"] { opacity: .45; }
+.leg-eintrag[aria-pressed="false"] .leg-strich { background: transparent !important; outline: 2px solid var(--leise); }
+.leg-strich { width: 16px; height: 4px; border-radius: 2px; display: inline-block; }
+.tooltip { position: absolute; pointer-events: none; background: #fff; border: 1px solid var(--rand); border-radius: 10px; padding: 10px 12px;
+  font-size: .85rem; line-height: 1.45; white-space: nowrap; box-shadow: 0 8px 28px rgba(20,70,40,.18); opacity: 0; transition: opacity .1s; z-index: 5; }
+.tooltip .zeit { color: var(--text2); margin-bottom: 4px; font-weight: 600; }
+.tooltip .zeile { display: flex; align-items: center; gap: 8px; }
+.tooltip .zeile .wert { margin-left: auto; padding-left: 14px; font-variant-numeric: tabular-nums; font-weight: 650; }
+.tooltip .hinweis { color: var(--leise); font-size: .78rem; margin-top: 6px; border-top: 1px solid var(--rand); padding-top: 5px; }
+.tooltip .punkt { width: 9px; height: 9px; border-radius: 50%; display: inline-block; }
+.karte { background: var(--flaeche); border: 1px solid var(--rand); border-radius: var(--rund); padding: 22px 24px; box-shadow: var(--schatten); }
+.karte h4 { font-size: 1.08rem; margin-bottom: 4px; }
+.karte .unter { color: var(--leise); font-size: .9rem; margin-bottom: 12px; }
+.knopfleiste { display: flex; flex-wrap: wrap; gap: 8px; margin: 14px 0; }
+.knopfleiste button { background: #fff; border: 1px solid var(--rand); color: var(--text2); border-radius: 999px; padding: 8px 16px; font: inherit; font-size: .95rem; cursor: pointer; }
+.knopfleiste button[aria-pressed="true"] { background: var(--akzent-dunkel); color: #fff; border-color: transparent; font-weight: 600; }
+.vielfach { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px; }
+.vielfach .titel { font-size: .95rem; font-weight: 600; margin-bottom: 4px; }
+.heatmap canvas { width: 100%; display: block; border-radius: 6px; }
+.farbleiste { display: flex; align-items: center; gap: 10px; font-size: .85rem; color: var(--leise); margin-top: 8px; }
+.farbleiste .verlauf { width: 220px; height: 10px; border-radius: 5px; background: linear-gradient(90deg, #f0f6fb, #aacdf0, #3c82dc, #123778); }
+.hbalken { display: grid; gap: 10px; }
+.hb-zeile { display: grid; grid-template-columns: minmax(130px, 30%) 1fr; gap: 12px; align-items: center; font-size: .95rem; }
+.hb-name { color: var(--text2); }
+.hb-spur { position: relative; height: 26px; }
+.hb-balken { height: 100%; border-radius: 0 4px 4px 0; min-width: 2px; }
+.hb-wert.innen { padding: 0 10px 0 0; color: #fff; text-shadow: 0 1px 2px rgba(0,0,0,.6); }
+.hb-wert { position: absolute; top: 50%; transform: translateY(-50%); padding-left: 8px; font-weight: 650; font-variant-numeric: tabular-nums; white-space: nowrap; }
+
+/* ---------- Geschichte ---------- */
+.kapitel { display: grid; grid-template-columns: minmax(300px, 1fr) minmax(0, 2.2fr); gap: 36px; padding: 56px 0; border-top: 1px solid var(--rand); align-items: start; }
+.kapitel .erzaehlung { position: sticky; top: 90px; }
+.kapitel .erzaehlung .datum { color: var(--akzent); font-weight: 650; margin-bottom: 6px; }
+.kapitel .erzaehlung p { color: var(--text2); }
+.kapitel .bilder { display: grid; gap: 18px; min-width: 0; }
+.zwei { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(420px, 100%), 1fr)); gap: 18px; }
+.zwei.eng { grid-template-columns: repeat(auto-fit, minmax(min(340px, 100%), 1fr)); }
+.mini-kacheln { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin: 16px 0; }
+.mini-kacheln .kachel { padding: 14px 16px; }
+.mini-kacheln .zahl { font-size: 1.8rem; }
+.rechner { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: 28px; align-items: center; }
+.regler { margin: 14px 0 22px; }
+.regler label { display: flex; justify-content: space-between; color: var(--text2); margin-bottom: 6px; }
+.regler label output { color: var(--text); font-weight: 650; font-variant-numeric: tabular-nums; }
+input[type=range] { width: 100%; accent-color: var(--akzent); height: 28px; }
+.ergebnis-zahl { font-size: clamp(3rem, 7vw, 5.5rem); font-weight: 750; line-height: 1; font-variant-numeric: tabular-nums; }
+.status { display: inline-flex; gap: 8px; align-items: center; border-radius: 999px; padding: 6px 14px; font-weight: 650; margin-top: 12px; }
+.status::before { content: ""; width: 10px; height: 10px; border-radius: 50%; background: currentColor; }
+
+/* ---------- Auffälligkeiten ---------- */
+.auff-layout { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr); gap: 28px; align-items: start; margin-top: 26px; }
+.lupe { position: sticky; top: 84px; }
+.lupe .kopf { display: flex; gap: 12px; align-items: baseline; flex-wrap: wrap; }
+.lupe .kopf .nr { color: var(--akzent); font-weight: 700; }
+.lupe .erkl { color: var(--text2); font-size: .98rem; margin-top: 10px; }
+.filter { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
+.karten { display: grid; gap: 10px; }
+.auff { text-align: left; background: var(--flaeche); box-shadow: 0 1px 2px rgba(20,70,40,.05); border: 1px solid var(--rand); border-radius: 12px; padding: 14px 16px; color: var(--text); font: inherit; cursor: pointer; display: grid; grid-template-columns: auto 1fr; gap: 4px 12px; }
+.auff:hover { background: var(--flaeche2); }
+.auff[aria-current="true"] { border-color: var(--akzent); background: var(--flaeche2); }
+.auff .nr { font-weight: 700; color: var(--akzent); grid-row: span 2; min-width: 2.6em; }
+.auff .t { font-weight: 650; }
+.auff .z { color: var(--leise); font-size: .88rem; }
+.auff .kat { font-size: .78rem; color: var(--text2); border: 1px solid var(--rand); border-radius: 999px; padding: 1px 8px; margin-left: 8px; font-weight: 500; }
+
+/* ---------- Fazit ---------- */
+.fazit-raster { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(380px, 100%), 1fr)); gap: 16px; margin-top: 24px; }
+.fazit-raster .karte h3 { font-size: 1.25rem; }
+.fazit-raster ul { padding-left: 1.2em; margin: 0; color: var(--text2); }
+.fazit-raster li { margin-bottom: 6px; }
+footer { position: relative; z-index: 1; padding: 40px 4vw 60px; color: var(--leise); border-top: 1px solid var(--rand); font-size: .9rem; }
+footer .innen { max-width: var(--breit); margin: 0 auto; display: flex; gap: 24px; flex-wrap: wrap; justify-content: space-between; }
+#testbericht { display: none; }
+
+/* ---------- Grüne Blasen im Hintergrund ----------
+   Liegen fest hinter dem Inhalt (position: fixed) und schweben langsam.
+   Nur transform wird animiert, das kann der Browser ohne Ruckeln zeichnen. */
+.blasen { position: fixed; inset: 0; z-index: 0; overflow: hidden; pointer-events: none; }
+.blasen i { position: absolute; left: var(--x); top: var(--y); width: var(--g); aspect-ratio: 1; border-radius: 50%;
+  background: radial-gradient(circle at 32% 28%, rgba(255,255,255,.85) 0 6%, rgba(120,225,160,.38) 30%, rgba(19,160,90,.20) 62%, rgba(19,160,90,.05) 70%, transparent 71%);
+  box-shadow: inset 0 0 0 1px rgba(19,160,90,.10);
+  animation: schweben var(--d, 30s) ease-in-out var(--v, 0s) infinite alternate; }
+.blasen i.weich { filter: blur(40px); opacity: .55; background: radial-gradient(circle, rgba(60,207,126,.55), rgba(19,160,90,.0) 70%); box-shadow: none; }
+@keyframes schweben {
+  0%   { transform: translate(0, 0) scale(1); }
+  50%  { transform: translate(var(--dx, 30px), calc(var(--dy, -40px) * .5)) scale(1.04); }
+  100% { transform: translate(calc(var(--dx, 30px) * -.6), var(--dy, -40px)) scale(.97); }
+}
+@media (prefers-reduced-motion: reduce) { .blasen i { animation: none; } }
+
+/* ---------- Schmale Fenster ---------- */
+@media (max-width: 1100px) {
+  .kapitel { grid-template-columns: 1fr; gap: 18px; }
+  .kapitel .erzaehlung, .lupe { position: static; }
+  .auff-layout, .rechner { grid-template-columns: 1fr; }
+}
+@media (max-width: 640px) {
+  body { font-size: 16px; }
+  section { padding: 48px 16px; }
+  nav.oben { padding: 12px 16px; gap: 14px; }
+  .kachel { padding: 16px; }
+  details.frage > summary { padding: 16px; font-size: 1.05rem; }
+  details.frage .antwort { padding: 0 16px 18px; }
+  .karte { padding: 16px; }
+  .hb-zeile { grid-template-columns: 1fr; gap: 2px; }
+}
+</style>
+</head>
+<body>
+<div class="blasen" aria-hidden="true"><i class="weich" style="--x:-8%;--y:-6%;--g:620px;--d:34s;--v:0s;--dx:60px;--dy:50px"></i><i class="weich" style="--x:62%;--y:48%;--g:700px;--d:40s;--v:-12s;--dx:-70px;--dy:-40px"></i><i class="weich" style="--x:30%;--y:85%;--g:520px;--d:38s;--v:-5s;--dx:50px;--dy:-60px"></i><i style="--x:6%;--y:18%;--g:150px;--d:26s;--v:-3s;--dx:40px;--dy:-60px"></i><i style="--x:84%;--y:10%;--g:110px;--d:22s;--v:-9s;--dx:-30px;--dy:50px"></i><i style="--x:72%;--y:34%;--g:56px;--d:18s;--v:-2s;--dx:24px;--dy:-46px"></i><i style="--x:16%;--y:62%;--g:84px;--d:24s;--v:-14s;--dx:-36px;--dy:-40px"></i><i style="--x:90%;--y:72%;--g:170px;--d:30s;--v:-7s;--dx:-40px;--dy:-50px"></i><i style="--x:46%;--y:8%;--g:40px;--d:16s;--v:-4s;--dx:20px;--dy:40px"></i><i style="--x:52%;--y:78%;--g:64px;--d:20s;--v:-11s;--dx:34px;--dy:-30px"></i><i style="--x:3%;--y:86%;--g:120px;--d:28s;--v:-6s;--dx:30px;--dy:-50px"></i><i style="--x:36%;--y:40%;--g:30px;--d:15s;--v:-8s;--dx:-18px;--dy:-36px"></i></div>
+
+<nav class="oben" aria-label="Hauptnavigation">
+  <a class="marke" href="#start">Radon<span>·</span>Mining</a>
+  <div class="links">
+    <a href="#wissen">1 Wissen</a>
+    <a href="#geschichte">2 Geschichte</a>
+    <a href="#auffaelligkeiten">3 Auffälligkeiten</a>
+    <a href="#fazit">4 Fazit</a>
+  </div>
+  <div id="fortschritt"></div>
+</nav>
+
+<!-- ======================= START ======================= -->
+<section id="start" class="held">
+  <div class="innen">
+    <div class="teil-nr">Radon Data Analysis · 5AHITS</div>
+    <h1>Ein unsichtbares Gas im <em>eigenen Haus</em></h1>
+    <p class="einleitung">Eine kostenlose Messung von radon.gv.at hat es aufgedeckt: In einem Einfamilienhaus in <b>Mining (Innviertel, OÖ)</b> ist zu viel Radon.
+      Danach hat der Besitzer <b>sieben Sensoren</b> aufgestellt, zuerst mit Lüften gegengesteuert und schließlich eine <b>Lüftungsanlage</b> eingebaut.
+      Diese Seite erklärt, was Radon ist, und zeigt, was man davon in <b><span data-w="zeilen"></span> Messwerten</b> von März bis Oktober 2026 sieht.</p>
+    <div class="kacheln">
+      <div class="kachel"><div class="zahl"><span data-w="max_kueche"></span><small>Bq/m³</small></div><div class="text">höchster Stundenwert in der Küche, <b>fast das Doppelte</b> des österreichischen Referenzwerts (300)</div></div>
+      <div class="kachel"><div class="zahl"><span data-w="luftwechsel"></span><small>% pro h</small></div><div class="text">So wenig Luft tauscht das <b>dichte Haus</b> aus, wenn alle Fenster zu sind (gemessen im Urlaub)</div></div>
+      <div class="kachel"><div class="zahl">−<span data-w="senkung"></span><small>%</small></div><div class="text">weniger Radon mit der <b>Lüftungsanlage</b>, fair verglichen: Fenster zu, gleiche Außentemperatur</div></div>
+      <div class="kachel"><div class="zahl"><span data-w="anzahl_auff"></span></div><div class="text"><b>Auffälligkeiten</b> in den Daten gefunden und erklärt, vom Urlaub bis zu den Sommerferien</div></div>
+    </div>
+    <div class="weiter">
+      <a class="knopf haupt" href="#wissen">Was ist Radon?</a>
+      <a class="knopf" href="#geschichte">Direkt zu den Daten</a>
+    </div>
+  </div>
+</section>
+
+<!-- ======================= TEIL 1: WISSEN ======================= -->
+<section id="wissen" class="trenner">
+  <div class="innen">
+    <div class="teil-kopf"><span class="teil-nr">Teil 1</span><h2>Wissen: Was ist Radon und warum ist es gefährlich?</h2></div>
+    <p class="einleitung">Die wichtigsten Fragen, einfach erklärt. Zum Aufklappen bitte auf eine Frage klicken. Alle Zahlen stammen von offiziellen Stellen (Quellen am Ende).</p>
+    <button class="knopf" id="alle-auf" type="button">Alle Antworten aufklappen</button>
+
+    <div class="fragen">
+      <details class="frage breit">
+        <summary><span class="symbol">?</span>Was ist Radon überhaupt?</summary>
+        <div class="antwort">
+          <div class="zwei"><div>
+          <p>Radon ist ein <b>radioaktives Edelgas</b>. Man kann es nicht sehen, nicht riechen und nicht schmecken. Es entsteht <b>im Boden</b>, wenn das natürlich vorkommende
+            <b>Uran</b> Schritt für Schritt zerfällt. Die direkte Vorstufe ist <b>Radium</b>.</p>
+          <p>Weil Radon ein Gas ist, kann es durch Poren und Risse im Boden nach oben wandern. Seine <b>Halbwertszeit beträgt 3,8 Tage</b>. Das ist lang genug, um aus dem Boden ins Haus zu gelangen, bevor es zerfällt.</p>
+          <p><b>Im Freien</b> verdünnt es sich sofort und ist dort unbedenklich. Gefährlich wird es erst, wenn es sich <b>in geschlossenen Räumen</b> sammelt.</p></div>
+          <div class="steckbrief">
+            <div><span>Art</span><b>Edelgas, radioaktiv</b></div>
+            <div><span>Chemisch</span><b>reagiert mit nichts (inert)</b></div>
+            <div><span>Halbwertszeit</span><b>3,82 Tage (Rn-222)</b></div>
+            <div><span>Entsteht aus</span><b>Radium-226 (Uran-Reihe)</b></div>
+            <div><span>Anteil an der Strahlenbelastung in Österreich</span><b>ca. ein Drittel, größte Einzelquelle</b></div>
+          </div></div>
+          <figure>
+            <svg class="schema" viewBox="0 0 980 230" role="img" aria-label="Zerfallsreihe von Uran-238 über Radium-226 und Radon-222 bis Blei-210">
+              <defs><marker id="pfeil" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#898781"/></marker></defs>
+              <g font-family="system-ui, sans-serif" text-anchor="middle">
+                <rect x="560" y="18" width="415" height="196" rx="14" fill="rgba(208,59,59,.10)" stroke="rgba(208,59,59,.55)"/>
+                <text x="767" y="40" fill="#c93c3c" font-size="15" font-weight="600">Folgeprodukte: zerfallen in der Lunge</text>
+                <g id="kette"></g>
+              </g>
+            </svg>
+            <figcaption>Vereinfachte Zerfallsreihe. α = Alphastrahlung, β = Betastrahlung. Unter jedem Stoff steht die Halbwertszeit.</figcaption>
+          </figure>
+        </div>
+      </details>
+
+      <details class="frage">
+        <summary><span class="symbol">☢</span>Warum ist Radon „giftig“?</summary>
+        <div class="antwort">
+          <p>Radon ist <b>nicht chemisch giftig</b>. Als Edelgas reagiert es mit nichts. Gefährlich ist es, weil es <b>radioaktiv</b> ist, und vor allem wegen seiner <b>Folgeprodukte</b>:
+            Polonium, Blei und Bismut.</p>
+          <p>Diese Folgeprodukte sind <b>Metall-Atome</b> und kein Gas mehr. Sie haften an winzigen Staubteilchen in der Luft. Atmet man sie ein, bleiben sie an der feuchten
+            Schleimhaut der Bronchien <b>kleben</b> und zerfallen dort innerhalb von Minuten weiter.</p>
+          <p>Die WHO stuft Radon als <b>nachgewiesen krebserregend</b> ein, in der gleichen Gruppe wie Tabakrauch und Asbest.</p>
+        </div>
+      </details>
+
+      <details class="frage">
+        <summary><span class="symbol">🫁</span>Warum ist es so schlecht für die Lunge?</summary>
+        <div class="antwort">
+          <div class="schritte">
+            <div><b>Einatmen:</b> Mit der Luft kommen Radon und seine an Staub gebundenen Folgeprodukte in die Lunge.</div>
+            <div><b>Kleben bleiben:</b> Das Gas wird wieder ausgeatmet. Die Metall-Atome bleiben an der Schleimhaut der Bronchien hängen.</div>
+            <div><b>Strahlen:</b> Polonium-218 und Polonium-214 zerfallen und senden <b>Alphastrahlung</b> aus.</div>
+            <div><b>Schaden:</b> Die Strahlung trifft genau die empfindlichen Zellen der Bronchien und kann ihr <b>Erbgut (DNA)</b> beschädigen.</div>
+          </div>
+          <p>Alphastrahlung kommt im Gewebe <b>nicht einmal einen Zehntelmillimeter</b> weit, gibt aber auf diesem kurzen Weg sehr viel Energie ab. Von außen ist sie harmlos,
+            weil sie schon an der Haut hängen bleibt. <b>In der Lunge</b> sitzt die Quelle aber direkt auf den Zellen. Deshalb ist die Lunge das Organ mit der höchsten
+            Strahlenbelastung aus natürlichen Quellen.</p>
+          <p>Man <b>spürt nichts</b>: Es gibt keinen Husten und keine Kopfschmerzen. Der Schaden zeigt sich, wenn überhaupt, erst nach <b>Jahren bis Jahrzehnten</b> als Lungenkrebs.
+            Andere Krankheiten verursacht Radon nach heutigem Wissen nicht.</p>
+        </div>
+      </details>
+
+      <details class="frage">
+        <summary><span class="symbol">%</span>Wie groß ist das Risiko?</summary>
+        <div class="antwort">
+          <p>Eine große Auswertung von 13 europäischen Studien mit über 7 000 Lungenkrebs-Fällen zeigt: Das Risiko steigt um <b>16 % pro 100 Bq/m³</b> im Langzeitmittel,
+            und zwar <b>gleichmäßig und ohne Schwelle</b>. Einen ganz „sicheren“ Wert gibt es also nicht.</p>
+          <p><b>Rauchen und Radon verstärken sich gegenseitig.</b> Das Lungenkrebs-Risiko bis zum 75. Lebensjahr:</p>
+          <div class="zwei">
+            <div><div class="titel klein">Nichtraucher</div><div id="d-rauch-nicht"></div></div>
+            <div><div class="titel klein">Raucher (eigene Skala, etwa 25-mal so hoch)</div><div id="d-rauch-ja"></div></div>
+          </div>
+          <p class="klein leise">X-Achse: Radon-Langzeitmittel in Bq/m³. Quelle: Darby et al. 2005 (BMJ).</p>
+          <p>Nach dem Rauchen ist Radon die <b>zweithäufigste Ursache für Lungenkrebs</b>, bei Nichtrauchern sogar die <b>häufigste</b>.
+            In <b>Österreich</b> gehen etwa <b>10 % der Lungenkrebsfälle (rund 400 pro Jahr)</b> auf Radon zurück, in Deutschland ca. 6 % der Lungenkrebs-Todesfälle.
+            In den <b>USA</b> schätzt man <b>21 000 Todesfälle pro Jahr</b>.</p>
+        </div>
+      </details>
+
+      <details class="frage">
+        <summary><span class="symbol">≤</span>Welcher Wert wird empfohlen?</summary>
+        <div class="antwort">
+          <p><b>Bq/m³</b> (Becquerel pro Kubikmeter) heißt: So viele Atome zerfallen <b>pro Sekunde</b> in einem Kubikmeter Luft. Bei 300 Bq/m³ sind das 300 Zerfälle pro Sekunde.</p>
+          <div id="d-grenzwerte" class="hbalken"></div>
+          <p style="margin-top:14px">Die <b>WHO empfiehlt 100 Bq/m³</b>. In Österreich gilt ein <b>Referenzwert von 300 Bq/m³</b> (Radonschutzverordnung 2020, EU-Höchstwert).
+            <b>Wichtig:</b> Gemeint ist immer das <b>Jahresmittel</b>. Einzelne Spitzen sind normal, entscheidend ist, wie viel man über lange Zeit einatmet.</p>
+          <h4 style="margin-top:18px">100 oder 300: Was ist der Unterschied?</h4>
+          <table class="tabelle">
+            <thead><tr><th>Langzeitmittel</th><th>Risiko</th><th>Lungenkrebs bis 75, je 1 000 Nichtraucher</th><th>je 1 000 Raucher</th></tr></thead>
+            <tbody>
+              <tr><td>0 Bq/m³</td><td>–</td><td>4</td><td>101</td></tr>
+              <tr class="who"><td>100 (WHO)</td><td>+16 %</td><td>5</td><td>116</td></tr>
+              <tr class="at"><td>300 (Österreich)</td><td>+48 %</td><td>6</td><td>≈ 145</td></tr>
+            </tbody>
+          </table>
+          <p class="klein leise">Europa: 13 Studien, 7 148 Erkrankte, +16 % pro 100 Bq/m³ (Darby 2005). Nordamerika: 7 Studien, 3 662 Erkrankte, +11 % pro 100 Bq/m³ (Krewski 2005).
+            Der Wert für 300 ist zwischen 100 und 400 interpoliert.</p>
+          <p><b>Warum 300 schlimmer ist:</b> Bq/m³ heißt Zerfälle pro Sekunde. Bei 300 zerfallen in jedem Kubikmeter <b>dreimal so viele</b> Atome, man atmet also dreimal so viele
+            strahlende Folgeprodukte ein, Stunde für Stunde, über Jahre. Die Strahlendosis ist ca. <b>2,5 mSv</b> pro Jahr bei 100 und <b>7,5 mSv</b> bei 300 (UNSCEAR-Umrechnung).</p>
+          <p><b>Auf den Punkt:</b> Das Risiko steigt <b>gleichmäßig</b>, eine sichere Grenze gibt es nicht. Auch unter 200 Bq/m³ war es in der Studie schon messbar erhöht.
+            300 ist deshalb kein „gesunder“ Wert, sondern die <b>Obergrenze</b>, die die EU erlaubt. Die WHO sagt: 100, und nur wo das nicht machbar ist, höchstens 300.</p>
+          <p><b>Rechtslage in Österreich:</b> Seit 2020 regeln das <b>Strahlenschutzgesetz</b> und die <b>Radonschutzverordnung (RnV)</b> den Schutz vor Radon (Umsetzung der EU-Richtlinie 2013/59/Euratom).
+            In <b>Radonschutzgebieten</b> müssen Arbeitgeber das Radon an Arbeitsplätzen messen lassen. In <b>Radonvorsorgegebieten</b> müssen <b>Neubauten</b> mit Aufenthaltsräumen
+            bauliche Vorsorge gegen Radon haben (OIB-Richtlinie, Bauordnung).</p>
+        </div>
+      </details>
+
+      <details class="frage">
+        <summary><span class="symbol">🌍</span>Welche Länder und Regionen sind betroffen?</summary>
+        <div class="antwort">
+          <p>Wie viel Radon entsteht, hängt vom <b>Gestein</b> ab. Uranreicher <b>Granit und Gneis</b> liefert viel, Sand und Ton weniger. Deshalb unterscheiden sich
+            die Durchschnittswerte in Europa etwa um das <b>Zehnfache</b>:</p>
+          <div id="d-europa" class="hbalken"></div>
+          <p class="klein leise" style="margin-top:6px">Landesmittelwerte nach UNSCEAR 2006, Österreich nach ÖNRAP. Alle Länder zeigt die Weltkugel unten.</p>
+          <p>In <b>Österreich</b> ist das <b>Granit-Hochland der Böhmischen Masse</b> (Mühl- und Waldviertel) am stärksten betroffen, außerdem Teile der Steiermark und Kärntens.
+            In <b>Oberösterreich</b> sind <b>37 Gemeinden Radonschutzgebiet</b>, und alle liegen im Mühlviertel. Fast der ganze Rest ist <b>Radonvorsorgegebiet</b>, nur der Bezirk Ried ist ausgenommen.</p>
+          <p><b>Mining</b> (Bezirk Braunau) ist <b>Vorsorgegebiet</b>, also die mittlere Stufe: Neubauten brauchen dort eine bauliche Radonvorsorge. Das Innviertel liegt nicht auf Granit, sondern auf den Sand-, Schotter- und
+            Tonschichten des Alpenvorlands. Das Haus steht also <b>nicht in einer Hochrisiko-Gegend</b> und hatte trotzdem zeitweise über 700 Bq/m³. Warum, zeigt Teil 2.</p>
+        </div>
+      </details>
+
+      <details class="frage breit">
+        <summary><span class="symbol">⌂</span>Wie kommt Radon ins Haus?</summary>
+        <div class="antwort">
+          <div class="zwei" style="align-items:center">
+            <figure style="margin:0">
+              <svg class="schema" viewBox="0 0 760 560" role="img" aria-label="Schnitt durch ein Haus: warme Luft steigt auf und entweicht oben, unten entsteht Unterdruck, der radonhaltige Bodenluft durch Risse und Durchführungen ansaugt">
+                <g font-family="system-ui, sans-serif" font-size="15">
+                  <!-- Boden -->
+                  <rect x="0" y="300" width="760" height="260" fill="#efe4d0"/>
+                  <g fill="#b07800" opacity=".45" id="bodenpunkte"></g>
+                  <text x="20" y="545" fill="#6b5534">Boden: Radon entsteht aus Uran/Radium</text>
+                  <!-- Haus -->
+                  <polygon points="150,120 380,20 610,120" fill="#dcebe1" stroke="#9aaba0" />
+                  <rect x="170" y="120" width="420" height="180" fill="#ffffff" stroke="#9aaba0"/>
+                  <line x1="170" y1="210" x2="590" y2="210" stroke="#9aaba0"/>
+                  <rect x="170" y="300" width="420" height="120" fill="#f1f4f2" stroke="#9aaba0"/>
+                  <text x="185" y="145" fill="#898781">Obergeschoss</text>
+                  <text x="185" y="235" fill="#898781">Erdgeschoss</text>
+                  <text x="185" y="325" fill="#898781">Keller</text>
+                  <!-- Stiege / offener Weg nach oben -->
+                  <rect x="470" y="125" width="60" height="290" fill="rgba(19,160,90,.08)"/>
+                  <!-- warme Luft steigt -->
+                  <g stroke="#d95926" stroke-width="4" fill="none" stroke-linecap="round">
+                    <path d="M500 400 C 500 330, 500 260, 500 150" marker-end="url(#pfeil-or)"/>
+                    <path d="M560 140 C 600 110, 640 95, 690 85" marker-end="url(#pfeil-or)"/>
+                  </g>
+                  <defs>
+                    <marker id="pfeil-or" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#d95926"/></marker>
+                    <marker id="pfeil-ge" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#d99a00"/></marker>
+                  </defs>
+                  <text x="600" y="70" fill="#d95926" font-weight="600">warme Luft entweicht oben</text>
+                  <text x="612" y="150" fill="#14231a" font-size="26" font-weight="700">+</text>
+                  <text x="612" y="400" fill="#14231a" font-size="30" font-weight="700">−</text>
+                  <text x="600" y="430" fill="#43554a">Unterdruck saugt</text>
+                  <!-- Eintrittswege -->
+                  <g stroke="#d99a00" stroke-width="3.5" fill="none" stroke-linecap="round">
+                    <path d="M240 470 L240 425" marker-end="url(#pfeil-ge)"/>
+                    <path d="M330 480 L330 425" marker-end="url(#pfeil-ge)"/>
+                    <path d="M120 380 L165 380" marker-end="url(#pfeil-ge)"/>
+                    <path d="M420 480 L420 425" marker-end="url(#pfeil-ge)"/>
+                  </g>
+                  <line x1="415" y1="420" x2="425" y2="440" stroke="#d99a00" stroke-width="2"/>
+                  <text x="200" y="500" fill="#fab219">Risse in der Bodenplatte</text>
+                  <text x="20" y="365" fill="#fab219">Fugen Wand/Boden</text>
+                  <text x="360" y="520" fill="#fab219">Rohr- und Kabeldurchführungen</text>
+                  <text x="200" y="285" fill="#43554a" font-size="13">offene Stiege: Radon kommt nach oben</text>
+                </g>
+              </svg>
+              <figcaption>Vereinfachter Schnitt durch ein Haus mit Keller (Kamineffekt).</figcaption>
+            </figure>
+            <div>
+              <p>Radon wird ins Haus <b>gesaugt</b>. Dahinter steckt der <b>Kamineffekt</b>: Warme Luft ist leichter, steigt im Haus nach oben und entweicht durch Undichtigkeiten im Dach
+                und in den oberen Fenstern. Dadurch entsteht unten ein <b>kleiner Unterdruck</b>, den man nicht spürt, und der zieht <b>Bodenluft</b> an.</p>
+              <p>Die Bodenluft kommt durch <b>Risse in der Bodenplatte</b>, <b>Fugen</b> zwischen Wand und Boden sowie durch <b>Rohr- und Kabeldurchführungen</b>, vor allem in den Keller.
+                Ist der Keller nach oben offen (Stiege ohne Tür, Schächte), verteilt sich das Radon im ganzen Haus.</p>
+              <p><b>Je größer der Temperaturunterschied</b> zwischen innen und außen, desto stärker ist der Sog. Deshalb ist Radon <b>im Winter und nachts</b> am höchsten.
+                Auch Wind und Abluftgeräte (Dunstabzug, Kamin, Wäschetrockner) erzeugen Unterdruck.</p>
+              <p>Ein <b>sehr dichtes Haus</b>, zum Beispiel ein Neubau oder ein thermisch saniertes Haus, tauscht kaum Luft aus. Das hereingesaugte Radon bleibt dann einfach drin.</p>
+            </div>
+          </div>
+        </div>
+      </details>
+
+      <details class="frage breit">
+        <summary><span class="symbol">⛰</span>Was hat der Boden damit zu tun, zum Beispiel Lehm?</summary>
+        <div class="antwort">
+          <p>Zwei Fragen entscheiden: <b>Wie viel Radon entsteht</b> im Boden (wie viel Uran und Radium er enthält)? Und <b>wie leicht kann die Bodenluft fließen</b> (Durchlässigkeit)?</p>
+          <div class="boeden">
+            <div class="boden"><h4>Granit, Gneis</h4>
+              <div class="skala">Radon-Bildung<span class="punkte"><i class="an"></i><i class="an"></i><i class="an"></i></span></div>
+              <div class="skala">Durchlässigkeit<span class="punkte"><i class="an"></i><i class="an"></i><i></i></span></div>
+              <p class="klein" style="margin:8px 0 0">Viel Uran, Luft fließt durch Klüfte. Typisch für das Mühlviertel.</p></div>
+            <div class="boden"><h4>Kies, Schotter</h4>
+              <div class="skala">Radon-Bildung<span class="punkte"><i class="an"></i><i></i><i></i></span></div>
+              <div class="skala">Durchlässigkeit<span class="punkte"><i class="an"></i><i class="an"></i><i class="an"></i></span></div>
+              <p class="klein" style="margin:8px 0 0">Wenig Radon, aber die Luft fließt sehr leicht. Kies unter der Bodenplatte kann den Eintritt bis zu 5-mal erhöhen.</p></div>
+            <div class="boden"><h4>Lehm, Ton</h4>
+              <div class="skala">Radon-Bildung<span class="punkte"><i class="an"></i><i class="an"></i><i></i></span></div>
+              <div class="skala">Durchlässigkeit<span class="punkte"><i class="an"></i><i></i><i></i></span></div>
+              <p class="klein" style="margin:8px 0 0">Bildet einiges an Radon, ist aber dicht und feucht und hält das Gas eher zurück. <b>Trocknet Lehm aus, bekommt er Risse</b>, und dann steigt die Durchlässigkeit stark an.</p></div>
+          </div>
+          <p><b>Nasser oder gefrorener Boden</b> wirkt wie ein Deckel: Das Radon kann nicht nach oben entweichen und sucht sich den leichtesten Weg, nämlich unter das Haus.
+            Die Durchlässigkeit kann sich an derselben Stelle je nach Feuchte bis etwa um das 90-Fache ändern.</p>
+        </div>
+      </details>
+
+      <details class="frage">
+        <summary><span class="symbol">📏</span>Wo und wie misst man Radon?</summary>
+        <div class="antwort">
+          <p>In Österreich gibt es eine <b>kostenlose Messung für Privathaushalte</b> (radon.gv.at, AGES). Man bekommt zwei kleine Detektoren für die <b>zwei meistgenutzten Räume</b>,
+            zum Beispiel Wohn- und Schlafzimmer. Sie bleiben <b>mindestens 6 Monate</b> stehen (Start im Dezember oder Juli) und werden dann nach Linz geschickt. Das Ergebnis kommt per E-Mail,
+            und die Daten fließen anonym in die Radonkarte ein.</p>
+          <p><b>Langzeitmessung</b> (mehrere Monate, am besten im Winterhalbjahr) ist die verlässlichste Methode und die Grundlage für den Vergleich mit dem Referenzwert.
+            Eine <b>Kurzzeitmessung</b> (Tage bis Wochen) liefert nur einen Momentwert und dient zur ersten Orientierung.</p>
+          <p><b>Elektronische Sensoren</b>, wie hier im Haus, messen alle paar Minuten. Damit sieht man, <b>wann und warum</b> das Radon steigt. Für den Vergleich mit dem Referenzwert zählt aber das Jahresmittel.</p>
+          <p>Eine Wiederholung empfiehlt sich alle <b>10 Jahre</b> (Vorsorgegebiet) bzw. alle <b>5 Jahre</b> (Schutzgebiet).</p>
+        </div>
+      </details>
+
+      <details class="frage">
+        <summary><span class="symbol">✓</span>Was kann man dagegen tun?</summary>
+        <div class="antwort">
+          <p><b>1. Lüften (Sofortmaßnahme):</b> Stoß- und Querlüften senkt das Radon sofort, laut radon.gv.at reicht das langfristig aber nicht.</p>
+          <p><b>2. Eintrittswege abdichten:</b> Risse, Fugen und Durchführungen abdichten und die Kellertür dicht machen. Aufenthaltsräume möglichst nicht in den Keller legen.</p>
+          <p><b>3. Lüftungsanlage:</b> Sie tauscht die Luft ständig aus. Wichtig ist ein <b>ausgeglichener Druck</b> (Zu- und Abluft, z. B. mit Wärmerückgewinnung) oder ein leichter Überdruck.
+            Eine <b>reine Abluftanlage</b> erzeugt dagegen Unterdruck, und solche Häuser hatten in Studien <b>mehr</b> Radon.</p>
+          <p><b>Vorsicht Dunstabzug:</b> Ein Dunstabzug mit Abluft nach draußen saugt in einem dichten Haus Bodenluft nach. In den Daten sieht man das am <b>20.07.</b> (Auffälligkeit A8).
+            Deshalb beim Kochen ein Fenster kippen, einen <b>Fensterkontaktschalter</b> einbauen oder einen Umluft-Dunstabzug verwenden.</p>
+          <p><b>4. Radonbrunnen bzw. Absaugung unter der Bodenplatte:</b> Das Radon wird abgesaugt, bevor es ins Haus kommt. In einem Testhaus waren es <b>−94 %</b>.</p>
+          <p><b>Kosten:</b> einfache Maßnahmen kosten meist ein paar hundert Euro, aufwendige etwa 2 000–15 000 €. <b>OÖ, die Steiermark und Tirol fördern</b> die Sanierung. In <b>Oberösterreich</b> sind es 20 % der Kosten, höchstens 2 000 €. Voraussetzung ist eine Langzeitmessung mit über 500 Bq/m³ (Stand 2023).
+            Beim <b>Neubau</b> ist Vorsorge billiger als eine spätere Sanierung. Wie viel Lüften bringt, kann man unten im <a href="#rechner">Radon-Rechner</a> ausprobieren.</p>
+        </div>
+      </details>
+
+      <details class="frage">
+        <summary><span class="symbol">💧</span>Gibt es Radon auch im Wasser oder in Baustoffen?</summary>
+        <div class="antwort">
+          <p>Ja, aber meist nur in kleinen Mengen. <b>Grundwasser</b> aus Granitgebieten kann viel Radon enthalten: Im Unteren Mühlviertel wurden im Mittel 122 Bq pro <b>Liter</b> gemessen.
+            Beim Duschen oder Kochen geht ein Teil davon in die Raumluft über. Radonhaltiges Brunnenwasser lässt sich durch Belüften oder Aktivkohle aufbereiten.
+            Auch <b>Baustoffe</b> aus radiumhaltigem Material (manche Natursteine wie Granit, Ziegel oder Beton) geben etwas Radon ab, meist aber deutlich weniger als der Untergrund.
+            Der mit Abstand wichtigste Weg ist aber die <b>Bodenluft unter dem Haus</b>.</p>
+        </div>
+      </details>
+    </div>
+
+    <div class="karte globus-karte" id="globus">
+      <div class="globus-layout">
+        <div>
+          <h3>Radon weltweit</h3>
+          <p class="unter" style="margin-bottom:6px">Mittlere Radonkonzentration in Wohnungen je Land. <b>Ziehen</b> dreht die Kugel, <b>Zeigen oder Tippen</b> auf ein Land zeigt den Wert.</p>
+          <div class="knopfleiste" id="globus-knoepfe" role="group" aria-label="Weltkugel drehen zu">
+            <button data-ziel="14,47" data-land="040">Österreich</button><button data-ziel="12,52">Europa</button><button data-ziel="-95,35">Amerika</button>
+            <button data-ziel="95,30">Asien</button><button data-ziel="140,-25">Australien</button>
+          </div>
+          <div class="globus-info" id="globus-info" aria-live="polite"></div>
+          <div class="globus-skala"><span>10</span><span class="verlauf"></span><span>≥ 150 Bq/m³</span><span class="keine"></span><span>keine Daten</span></div>
+          <div class="rangliste" id="globus-liste"></div>
+          <p class="klein leise" style="margin:12px 0 0" id="globus-quelle"></p>
+        </div>
+        <div class="globus-zeichen"><canvas id="globus-canvas" role="img" aria-label="Drehbare Weltkugel mit der mittleren Radonkonzentration in Wohnungen je Land"></canvas><div class="tooltip"></div></div>
+      </div>
+    </div>
+
+    <details class="frage" style="margin-top:16px">
+      <summary><span class="symbol">§</span>Quellen</summary>
+      <div class="antwort">
+        <ul class="quellen">
+          <li><a href="https://www.radon.gv.at/rund-um-radon/warum-ist-radon-gefaehrlich">radon.gv.at – Warum ist Radon gefährlich?</a></li>
+          <li><a href="https://www.radon.gv.at/rund-um-radon/wie-kann-ich-radon-messen/kostenlose-radonmessung-in-privathaushalten">radon.gv.at – Kostenlose Radonmessung</a></li>
+          <li><a href="https://www.radon.gv.at/information-fuer/buergerinnen/radonsanierung">radon.gv.at – Radonsanierung</a></li>
+          <li><a href="https://www.bfs.de/DE/themen/ion/umwelt/radon/einfuehrung/einfuehrung.html">Bundesamt für Strahlenschutz – Radon Einführung</a></li>
+          <li><a href="https://www.who.int/news/item/21-09-2009-who-calls-for-tighter-standards-on-indoor-radon">WHO (2009) – Tighter standards on indoor radon</a></li>
+          <li><a href="https://carroll.stat.tamu.edu/wp-content/uploads/2023/10/darbypaper_BMJ.pdf">Darby et al. (2005), BMJ – 13 europäische Studien</a></li>
+          <li><a href="https://epa.gov/radon/what-epas-action-level-radon-and-what-does-it-mean">US EPA – Action Level</a></li>
+          <li><a href="https://www.land-oberoesterreich.gv.at/Mediendateien/Formulare/Dokumente%20UWD%20Abt_US/Radongebiete_ooe_gemaess_rnv.pdf">Land OÖ – Radongebiete gemäß RnV</a></li>
+          <li><a href="https://news.wko.at/oe/news/radonschutzv--erlaeuterungen.pdf">WKO – Erläuterungen Radonschutzverordnung</a></li>
+          <li><a href="https://www.unscear.org/unscear/uploads/documents/publications/UNSCEAR_2006_Annex-E-CORR.pdf">UNSCEAR 2006, Annex E – Radon in Wohnungen weltweit (Tabelle 1)</a></li>
+          <li><a href="https://pubmed.ncbi.nlm.nih.gov/15703527/">Krewski et al. (2005) – 7 nordamerikanische Studien</a></li>
+          <li>Friedmann (2005), Health Physics – Final results of the Austrian Radon Project (ÖNRAP)</li>
+          <li><a href="https://github.com/topojson/world-atlas">world-atlas / Natural Earth – Ländergrenzen der Weltkugel</a></li>
+          <li><a href="https://pubs.usgs.gov/publication/70209723">USGS – Wetter und Boden und Radon in der Bodenluft</a></li>
+          <li><a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC12057567/">Lüftung und Radon in kanadischen Häusern</a></li>
+          <li><a href="https://ssk.de/fileadmin/documents/de/1985/Strahlenexposition_Radon.pdf">Strahlenschutzkommission – Strahlenexposition durch Radon</a></li>
+          <li><a href="https://www.land-oberoesterreich.gv.at/radon.htm">Land OÖ – Was ist Radon?</a></li>
+          <li><a href="https://www.land-oberoesterreich.gv.at/Mediendateien/Formulare/Dokumente%20UWD%20Abt_US/Radon_2023_04_UL_Leithner.pdf">Land OÖ (2023) – Präsentation Radon, Förderung</a></li>
+          <li><a href="https://www.wko.at/oe/betriebsanlagen/leitfaden-arbeitsplaetze-radonschutzgebiete.pdf">WKO – Leitfaden Arbeitsplätze in Radonschutzgebieten</a></li>
+          <li><a href="https://www.gesundheit.gv.at/leben/umwelt/radiokativitaet/strahlenbelastung.html">gesundheit.gv.at – Strahlenbelastung in Österreich</a></li>
+          <li><a href="https://www.ages.at/themen/strahlenschutz/radon/">AGES – Was ist Radon?</a></li>
+        </ul>
+      </div>
+    </details>
+  </div>
+</section>
+
+<!-- ======================= TEIL 2: GESCHICHTE ======================= -->
+<section id="geschichte" class="trenner">
+  <div class="innen">
+    <div class="teil-kopf"><span class="teil-nr">Teil 2</span><h2>Die Geschichte des Hauses in Daten</h2></div>
+    <p class="einleitung">Sieben Radon-Sensoren vom Keller bis zum Schlafzimmer, dazu CO₂, Temperatur und Wetter. Die Zeiträume (Lüften, Fenster offen, Urlaub, Lüftungsanlage)
+      hat das Programm <b>selbst aus den Daten erkannt</b>. Mit der Maus über das Diagramm fahren zeigt die Werte, die Knöpfe zoomen in eine Phase, und ein Klick auf einen Raum in der Legende blendet ihn ein oder aus.</p>
+
+    <div class="karte" style="margin-top:22px">
+      <div class="knopfleiste" id="phasen-knoepfe" role="group" aria-label="Zeitraum wählen"></div>
+      <div class="knopfleiste" id="ansicht-knoepfe" role="group" aria-label="Ansicht wählen" style="margin-top:0">
+        <button data-ansicht="gruppen" aria-pressed="true">4 Gruppen</button>
+        <button data-ansicht="raeume" aria-pressed="false">alle 7 Räume</button>
+      </div>
+      <div id="d-gesamt"></div>
+    </div>
+
+    <!-- Kapitel 1 -->
+    <div class="kapitel" id="k-fruehling">
+      <div class="erzaehlung">
+        <div class="datum">24. März – 21. Juni</div>
+        <h3>1 · Messbeginn und Morgenlüften</h3>
+        <p>Zum Messbeginn Ende März liegt die Küche bei bis zu <b><span data-w="max_kueche"></span> Bq/m³</b>. Draußen hat es 0–5 °C, drinnen ist es warm, also ist der Kamineffekt stark.</p>
+        <p>Die erste Gegenmaßnahme ist <b>Lüften</b>, und zwar <b>von Anfang an</b>. Das Programm findet <b><span data-w="lueft_anzahl"></span> plötzliche Abfälle</b>, die meisten <b>zwischen 5 und 8 Uhr</b>.
+          Danach sinkt das Radon auf ca. <b><span data-w="lueft_2h"></span> %</b>, bleibt tagsüber niedrig und baut sich <b>jede Nacht wieder auf</b>.
+          Nachts ist es im Frühling 3- bis 5-mal so hoch wie am Nachmittag.</p>
+        <p>Der <b>Keller</b> ist in dieser Zeit fast radonfrei, weil die Kellerfenster offen waren.</p>
+      </div>
+      <div class="bilder">
+        <div class="karte"><h4>Durchschnittlicher Tagesverlauf je Phase</h4><div class="unter">Radon in Bq/m³, logarithmische Achse, damit der Urlaub den Rest nicht erdrückt</div><div id="d-tagesgang" class="vielfach"></div></div>
+        <div class="zwei">
+          <div class="karte"><h4>Was Lüften bewirkt</h4><div class="unter">Mittel aus <span data-w="lueft_morgens"></span> Morgenlüftungen, in % des Werts davor</div><div id="d-lueftkurve"></div></div>
+          <div class="karte"><h4>Wann wurde gelüftet?</h4><div class="unter">Uhrzeit der erkannten Lüftungsereignisse</div><div id="d-lueftzeit"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Kapitel 2 -->
+    <div class="kapitel" id="k-sommer">
+      <div class="erzaehlung">
+        <div class="datum"><span data-w="fenster_von"></span> – Ende August</div>
+        <h3>2 · „Immer Fenster offen“</h3>
+        <p>Ab dem <span data-w="fenster_von"></span> steigt das CO₂ im Schlafzimmer nachts nicht mehr an (in <b><span data-w="fenster_anteil"></span> %</b> der Nächte). Die Fenster sind also <b>Tag und Nacht offen</b>. Gelüftet wurde schon vorher, aber nur kurz.</p>
+        <p>Die Wohnräume sind so niedrig wie nie. Aber der <b>Keller ist so hoch wie nie</b>: Bei Hitze bleiben die Kellerfenster zu, damit keine feuchte Luft hineinkommt,
+          und dann füllt sich der Keller tagelang mit Radon. Wohnräume und Keller sind <b>zwei getrennte Welten</b> (Korrelation <span data-w="korr_vor"></span>).</p>
+        <p><b>Ausreißer am 20.07.:</b> Das Radon steigt an einem einzigen Tag auf über <span data-w="dz_max"></span> Bq/m³. Der Grund ist laut Hausbesitzer der <b>Dunstabzug</b>:
+          Er bläst Luft aus dem dichten Haus, und dabei wird Bodenluft nachgesaugt. Es strömt <b>doppelt so viel Radon</b> nach wie im Urlaub, obwohl es draußen so warm war wie drinnen (Auffälligkeit A8).</p>
+      </div>
+      <div class="bilder">
+        <div class="karte"><h4>Wohnräume gegen Keller im Sommer</h4><div class="unter">Stundenwerte in Bq/m³</div><div id="d-sommer"></div></div>
+      </div>
+    </div>
+
+    <!-- Kapitel 3 -->
+    <div class="kapitel" id="k-urlaub">
+      <div class="erzaehlung">
+        <div class="datum"><span data-w="urlaub_von"></span> – <span data-w="urlaub_bis"></span></div>
+        <h3>3 · Urlaub: alles zu, niemand daheim</h3>
+        <p>Der Urlaub ist ein <b>natürliches Experiment</b>: Niemand lüftet, niemand atmet. Das CO₂ sinkt langsam und gleichmäßig, das Radon steigt in <b>allen Räumen über 300</b>.</p>
+        <p>Aus den beiden Kurven lässt sich ausrechnen, <b>wie dicht das Haus ist</b>: Pro Stunde wird nur <b><span data-w="luftwechsel"></span> %</b> der Luft ausgetauscht.
+          Gleichzeitig strömen etwa <b><span data-w="zustrom"></span> Bq/m³ pro Stunde</b> aus dem Boden nach. Das Radon pendelt sich bei <b>≈ <span data-w="gleichgewicht"></span> Bq/m³</b> ein.</p>
+        <p>CO₂ und Radon liefern <b>unabhängig voneinander</b> denselben Luftwechsel. Das zeigt, dass die Rechnung stimmt.</p>
+        <p>Bei der Heimkehr am Abend wird sofort gelüftet, und in 3 Stunden fällt das Radon in der Küche von 330 auf 14.</p>
+      </div>
+      <div class="bilder">
+        <div class="mini-kacheln" id="urlaub-kacheln"></div>
+        <div class="karte"><h4>Radon steigt</h4><div class="unter">Bq/m³; dünne dunkle Linie = angepasste physikalische Kurve (Küche)</div><div id="d-urlaub-rn"></div></div>
+        <div class="karte"><h4>CO₂ fällt</h4><div class="unter">ppm; die Außenluft hat etwa 420 ppm</div><div id="d-urlaub-co2"></div></div>
+      </div>
+    </div>
+
+    <!-- Kapitel 4 -->
+    <div class="kapitel" id="k-kwl">
+      <div class="erzaehlung">
+        <div class="datum">ab <span data-w="kwl_ab"></span></div>
+        <h3>4 · Die Lüftungsanlage</h3>
+        <p>Ab dem <span data-w="kwl_ab"></span> bleibt der Keller <b>dauerhaft unter 100</b>. Keller und Wohnräume verlaufen plötzlich gemeinsam, die Korrelation steigt
+          von <b><span data-w="korr_vor"></span></b> auf <b><span data-w="korr_nach"></span></b>. Die Anlage verbindet die Stockwerke und tauscht ständig Luft aus. Das Morgenlüften verschwindet.</p>
+        <p>Ein <b>fairer Vergleich</b> braucht gleiche Bedingungen. Deshalb werden nur Nächte mit <b>geschlossenem Fenster</b> verglichen (CO₂ steigt), getrennt nach Außentemperatur.
+          Ergebnis: Mit Anlage ist das Radon im Schnitt <b><span data-w="senkung"></span> % niedriger</b>.</p>
+        <p class="leise klein">Hinweis: Mit Anlage gibt es nur wenige sehr warme Nächte (1 Nacht über 16 °C). Diese Gruppe ist daher unsicher.</p>
+      </div>
+      <div class="bilder">
+        <div class="karte"><h4>Der Wechsel</h4><div class="unter">Bq/m³, 10 Tage vor bis 12 Tage nach dem Start</div><div id="d-kwl"></div></div>
+        <div class="karte"><h4>Nächte mit geschlossenem Fenster: ohne und mit Anlage</h4><div class="unter">Radon in den Wohnräumen nachts (Bq/m³), nach Außentemperatur</div><div id="d-fair"></div></div>
+      </div>
+    </div>
+
+    <!-- Kapitel 5 -->
+    <div class="kapitel" id="k-warum">
+      <div class="erzaehlung">
+        <div class="datum">die ganze Messzeit</div>
+        <h3>5 · Warum ist es, wie es ist?</h3>
+        <p><b>Kamineffekt:</b> In den Wohnräumen steigt das Radon, je kälter es draußen im Vergleich zu drinnen ist. Das passt genau zur Theorie.</p>
+        <p>Im <b>Keller</b> war es vor der Anlage <b>umgekehrt</b>. Das ist keine Physik, sondern Verhalten: Bei Kälte waren die Kellerfenster offen, bei Hitze zu.
+          Mit Anlage folgt auch der Keller dem Kamineffekt.</p>
+        <p><b>Wind</b> senkt das Radon ein wenig, weil er Außenluft durch Undichtigkeiten drückt (ca. <span data-w="wind_mit"></span> Bq/m³ pro 10 km/h). Das ist deutlich weniger als beim Kamineffekt.
+          Beim <b>Luftdruck</b> gibt es keinen klaren Zusammenhang.</p>
+        <p class="leise klein">„Herausgerechnet“ heißt: Mit einer Regression wird der Einfluss jeder Größe bestimmt, während die anderen gleich bleiben. Das ist wichtig, weil windige Tage oft auch kalte Tage sind.</p>
+        <p>Die <b>Heatmap</b> zeigt alles auf einen Blick: jede Spalte ist ein Tag, jede Zeile eine Uhrzeit. Man sieht das nächtliche Radon im Frühling, den hellen Urlaub
+          und den ruhigeren Herbst mit Anlage.</p>
+      </div>
+      <div class="bilder">
+        <div class="karte" id="kamin"><h4>Kamineffekt: Radon nach Temperaturunterschied</h4><div class="unter">innen minus außen in °C (rechts = draußen kälter); Mittelwerte in Bq/m³</div><div id="d-kamin" class="zwei eng"></div></div>
+        <div class="zwei">
+          <div class="karte" id="wind"><h4>Wind</h4><div class="unter">Wohnräume, Bq/m³, nach Windstärke in km/h</div><div id="d-wind"></div><p class="klein leise" style="margin:8px 0 0">Temperatur herausgerechnet: ca. <span data-w="wind_vor"></span> bzw. <span data-w="wind_mit"></span> Bq/m³ pro 10 km/h Wind.</p></div>
+          <div class="karte" id="druck"><h4>Luftdruckänderung in 12 h</h4><div class="unter">Wohnräume, Bq/m³, nach hPa-Änderung</div><div id="d-druck"></div><p class="klein leise" style="margin:8px 0 0">Vorher <span data-w="druck_vor"></span>, mit Anlage <span data-w="druck_mit"></span> Bq/m³ pro hPa, also kein klarer Zusammenhang.</p></div>
+        </div>
+        <div class="karte heatmap"><h4>Radon nach Uhrzeit und Tag</h4>
+          <div class="knopfleiste" id="hm-knoepfe" role="group" aria-label="Heatmap wählen">
+            <button data-k="g_wohn" aria-pressed="true">Wohnräume</button><button data-k="g_keller" aria-pressed="false">Keller</button>
+            <button data-k="radon_Schlafzimmer" aria-pressed="false">Schlafzimmer</button><button data-k="co2_Schlafzimmer" aria-pressed="false">CO₂ Schlafzimmer</button>
+          </div>
+          <div id="d-heatmap"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Rechner -->
+    <div class="kapitel" id="rechner">
+      <div class="erzaehlung">
+        <div class="datum">zum Ausprobieren</div>
+        <h3>6 · Radon-Rechner: Wie viel bringt Lüften?</h3>
+        <p>Im Gleichgewicht strömt genau so viel Radon herein, wie durch Lüften und Zerfall verschwindet:</p>
+        <p style="font-size:1.2rem;color:var(--text)"><b>Radon = Zustrom ÷ (Luftwechsel + Zerfall)</b></p>
+        <p>Der Zustrom wurde im Urlaub gemessen. Mit dem Regler für den Luftwechsel sieht man, warum ein dichtes Haus ohne Lüftung Probleme bekommt.
+          Ein typischer Richtwert für eine Lüftungsanlage liegt bei etwa <b>0,3–0,5 pro Stunde</b>.</p>
+      </div>
+      <div class="karte rechner">
+        <div>
+          <div class="regler"><label for="r-n">Luftwechsel (Anteil der Luft pro Stunde) <output id="o-n"></output></label><input id="r-n" type="range" min="0" max="1000" value="200"></div>
+          <div class="regler"><label for="r-s">Zustrom aus dem Boden <output id="o-s"></output></label><input id="r-s" type="range" min="1" max="40" step="0.5"></div>
+          <div class="knopfleiste" id="r-vorlagen">
+            <button data-n="0.02">Urlaub (gemessen)</button><button data-n="0.3">mit Lüftungsanlage</button><button data-n="1">Fenster gekippt</button>
+          </div>
+        </div>
+        <div style="text-align:center">
+          <div class="leise">Radon im Gleichgewicht</div>
+          <div class="ergebnis-zahl" id="r-ergebnis">–</div>
+          <div class="leise">Bq/m³</div>
+          <div class="status" id="r-status"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ======================= TEIL 3: AUFFÄLLIGKEITEN ======================= -->
+<section id="auffaelligkeiten" class="trenner">
+  <div class="innen">
+    <div class="teil-kopf"><span class="teil-nr">Teil 3</span><h2>Alle <span data-w="anzahl_auff"></span> Auffälligkeiten</h2></div>
+    <p class="einleitung">Jede Auffälligkeit mit Erklärung. Ein Klick auf eine Karte zeigt den passenden Zeitraum in der <b>Lupe</b>.
+      <b>A</b> = Verhalten und Maßnahmen, <b>B</b> = Haus und Räume, <b>C</b> = Datenqualität.</p>
+    <div class="auff-layout">
+      <div class="lupe karte" id="lupe">
+        <div class="kopf"><span class="nr" id="lupe-nr"></span><h3 id="lupe-titel" style="margin:0"></h3></div>
+        <div class="unter" id="lupe-zeit"></div>
+        <div id="d-lupe"></div>
+        <p class="erkl" id="lupe-was"></p>
+        <p class="erkl" id="lupe-warum"></p>
+        <a class="knopf" id="lupe-link" hidden>Zum passenden Diagramm</a>
+      </div>
+      <div>
+        <div class="filter knopfleiste" id="auff-filter" role="group" aria-label="Kategorie filtern"></div>
+        <div class="karten" id="auff-karten"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ======================= TEIL 4: FAZIT ======================= -->
+<section id="fazit" class="trenner">
+  <div class="innen">
+    <div class="teil-kopf"><span class="teil-nr">Teil 4</span><h2>Fazit</h2></div>
+    <p class="einleitung">Die wichtigsten Antworten, kurz und mit Zahlen aus den Messdaten.</p>
+    <div class="punkte-raster">
+      <div class="punkt-karte"><div class="frage-k">Wie schlimm ist es?</div>
+        <div class="gross"><span data-w="f_mittel"></span><small>Bq/m³ im Schnitt</small></div>
+        <p>Wohnräume März–Oktober: <b>unter der WHO-Empfehlung 100</b>. Ganz ohne Lüften pendelt sich das Haus aber bei <b>≈ <span data-w="gleichgewicht"></span></b> ein, also <b>über 300</b>.</p>
+        <p>Lungenkrebs-Risiko: <b>+<span data-w="f_risiko_mittel"></span> %</b> beim gemessenen Schnitt, <b>+<span data-w="f_risiko_zu"></span> %</b> im geschlossenen Haus.</p></div>
+      <div class="punkt-karte"><div class="frage-k">Hat Lüften geholfen?</div>
+        <div class="gross">−<span data-w="f_lueften"></span><small>% nach 2 Stunden</small></div>
+        <p><b>Ja, aber nur für Stunden.</b> Nachts steigt es wieder auf das <b><span data-w="f_nacht"></span>-Fache</b> (um 6 Uhr Ø <span data-w="f_nacht_max"></span>, nachmittags Ø <span data-w="f_nacht_min"></span>).</p>
+        <p><b>Warum nicht genug:</b> Der Boden liefert ständig nach, das dichte Haus hält es fest, und man schläft genau im Höchstwert. Im Winter kann man nicht dauernd lüften.</p></div>
+      <div class="punkt-karte"><div class="frage-k">Wie dicht ist das Haus?</div>
+        <div class="gross"><span data-w="luftwechsel"></span><small>% Luft pro Stunde</small></div>
+        <p>So viel Luft wird getauscht, wenn alles zu ist. Empfohlen sind <b>30–50 %</b>, also <b><span data-w="f_dicht"></span>-mal zu wenig</b>.</p>
+        <p>Deshalb sammelt sich jedes bisschen Radon an: im Urlaub in 6 Tagen über 300.</p></div>
+      <div class="punkt-karte"><div class="frage-k">Wie viel Druck saugt das Radon an?</div>
+        <div class="gross"><span data-w="f_druck_sommer"></span> / <span data-w="f_druck_winter"></span><small>Pascal (Sommer / Winter)</small></div>
+        <p>Unterdruck durch den Kamineffekt, berechnet aus den gemessenen Temperaturen über <span data-w="f_hoehe"></span> m Haushöhe. Im Winter ist der Sog <b>etwa <span data-w="f_druck_faktor"></span>-mal so stark</b>.</p>
+        <p>Das ist winzig: <b>weniger als ein Zwanzigtausendstel</b> des Luftdrucks. Man spürt es nicht, und unsere Drucksensoren schwanken stärker (± <span data-w="f_sensor"></span> Pa). Für Bodenluft reicht es trotzdem.</p></div>
+      <div class="punkt-karte doppelt"><div class="frage-k">Winter gegen Sommer</div>
+        <div class="gross"><span data-w="f_faktor"></span>×<small>so viel in der Heizzeit</small></div>
+        <p>Ohne Anlage: Ende März Ø <b><span data-w="f_heiz"></span></b>, im Sommer Ø <b><span data-w="f_sommer"></span></b> Bq/m³.</p>
+        <p>Mit Anlage bei Kälte nur noch <b>≈ <span data-w="f_anlage_faktor"></span>×</b> (Ø <span data-w="f_anlage_kalt"></span> statt <span data-w="f_anlage_warm"></span>). Schätzung für den Winter: <b>unter 100</b>. Gemessen ist der Winter aber noch nicht.</p></div>
+      <div class="punkt-karte breit"><div class="frage-k">Warum ist 300 schlimmer als 100?</div>
+        <div class="gross">3×<small>so viele Zerfälle → 3× so viel Zusatzrisiko</small></div>
+        <div class="vier"><p><b>Warum:</b> Bq/m³ zählt Zerfälle pro Sekunde. Im Schlafzimmer (≈ 30 m³) sind das bei 100 rund <b>3 000</b>, bei 300 rund <b>9 000 pro Sekunde</b>, jede Nacht, jahrelang. Jeder Zerfall in der Lunge kann eine Zelle treffen.</p>
+        <p><b>Verhältnis:</b> In den Studien steigt das Risiko auf einer <b>geraden Linie</b>: +16 % pro 100 Bq/m³. 300 heißt also +48 % statt +16 %.</p>
+        <p><b>Wie viel ist das?</b> Je 1 000 Nichtraucher bis 75: <b>6 statt 5</b> Fälle (klein). Je 1 000 Raucher: <b>≈ 145 statt 116</b> (groß).</p>
+        <p><b>Nicht wie 1 gegen 3 Zigaretten im Jahr:</b> Radon atmet man jede Stunde ein. 100 Bq/m³ ergeben ca. <b>2,5 mSv</b> Strahlung pro Jahr, 300 ca. <b>7,5 mSv</b>. Zum Vergleich: alle Strahlenquellen zusammen ergeben in Österreich im Schnitt 4,5 mSv.</p></div>
+        <p class="klein leise" style="margin-top:8px">Darby 2005, Krewski 2005; Umrechnung in mSv nach UNSCEAR 2000 (7 000 h zu Hause pro Jahr). Mehr in Teil 1.</p></div>
+    </div>
+    <div class="fazit-raster" style="margin-top:28px">
+      <div class="karte"><h3>Was passiert in diesem Haus?</h3><ul>
+        <li>Radon kommt <b>von unten</b>, aus dem Boden durch den Keller und die Bodenplatte (siehe Küche-Sockel).</li>
+        <li>Das Haus ist <b>sehr dicht</b> (<span data-w="luftwechsel"></span> % Luftwechsel pro Stunde). Ohne Lüften würde es sich auf <b>≈ <span data-w="gleichgewicht"></span> Bq/m³</b> einpendeln, also über dem Referenzwert.</li>
+        <li>Der <b>Kamineffekt</b> treibt das Radon: nachts und bei Kälte mehr, im Sommer weniger.</li>
+        <li>Auch der <b>Dunstabzug</b> saugt Radon an: Am 20.07. strömte doppelt so viel nach wie im Urlaub.</li>
+      </ul></div>
+      <div class="karte"><h3>Hat es etwas gebracht?</h3><ul>
+        <li><b>Lüften:</b> ja, aber nur kurz. Es senkt das Radon sofort, nachts kommt es wieder.</li>
+        <li><b>Fenster immer offen:</b> Die Wohnräume waren niedrig, der Keller aber sehr hoch. Im Winter ist das ohnehin keine Lösung.</li>
+        <li><b>Lüftungsanlage:</b> ja. Fair verglichen <b>−<span data-w="senkung"></span> %</b>, und der Keller liegt dauerhaft unter 100.</li>
+      </ul></div>
+      <div class="karte"><h3>Was noch offen ist</h3><ul>
+        <li>Es fehlt der <b>Winter</b>, der kritischste Zeitraum. Erst eine Messung über den Winter zeigt, ob die Anlage auch dann reicht.</li>
+        <li>Alle Mittelwerte stammen aus März bis Oktober und sind <b>kein Jahresmittel</b>.</li>
+        <li>Was am <b>31.03.</b> passiert ist (plötzlich viel weniger Radon), wird noch nachgefragt.</li>
+      </ul></div>
+      <div class="karte"><h3>Tipps für jedes Haus</h3><ul>
+        <li><b>Messen</b>: Die kostenlose Messung über radon.gv.at nutzen.</li>
+        <li>Wer ein Haus <b>dicht saniert</b>, sollte an eine Lüftung denken.</li>
+        <li>Kellertür zu, Risse und Durchführungen abdichten.</li>
+        <li>Beim Kochen mit Dunstabzug ein <b>Fenster kippen</b>.</li>
+        <li>Bei hohen Werten eine Fachperson für Radonschutz fragen. In OÖ gibt es Förderung.</li>
+      </ul></div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="innen">
+    <div><b>Radon Data Analysis</b> · 5AHITS · INSY · Aldin Mukic &amp; Lisa Hintermaier</div>
+    <div>Messzeit <span data-w="zeitraum"></span> · Auswertung mit Python, Diagramme selbst gezeichnet (ohne Bibliotheken)</div>
+  </div>
+</footer>
+<pre id="testbericht"></pre>
+
+<script>
+"use strict";
+const DATEN = /*__DATEN__*/null;
+const FEHLER = [];
+window.addEventListener("error", ev => FEHLER.push(String(ev.message)));
+
+/* ============================================================
+   Grundlagen: Zeit, Reihen, Namen, Farben
+   Zeitstempel sind Ortszeit (Wien). Wir rechnen sie als „UTC“ ein,
+   damit die Uhrzeit beim Anzeigen nicht verschoben wird.
+   ============================================================ */
+const STUNDE = 3600e3, TAG = 24 * STUNDE;
+const ZERFALL = Math.log(2) / (3.8235 * 24);
+function zeitWert(s) {
+  const [d, t = "00:00"] = s.split(/[T ]/);
+  const [J, M, T] = d.split("-").map(Number);
+  const [h, m, sek = 0] = t.split(":").map(Number);
+  return Date.UTC(J, M - 1, T, h, m, sek);
+}
+const T0 = zeitWert(DATEN.start);
+const ANZ = DATEN.reihen.radon_Kueche.length;
+const ZEIT = Float64Array.from({ length: ANZ }, (_, i) => T0 + i * STUNDE);
+const ENDE = ZEIT[ANZ - 1];
+
+// Gruppen-Mittelwerte (wie in diagramme.py): Wohnräume = Küche/Wohnzimmer/Büro, Keller = Technikraum/Werkstatt
+function mittelReihe(schluessel) {
+  return Array.from({ length: ANZ }, (_, i) => {
+    const w = schluessel.map(k => DATEN.reihen[k][i]).filter(v => v !== null);
+    return w.length ? w.reduce((a, b) => a + b, 0) / w.length : null;
+  });
+}
+DATEN.reihen.g_wohn = mittelReihe(["radon_Kueche", "radon_Wohnzimmer", "radon_Buero"]);
+DATEN.reihen.g_keller = mittelReihe(["radon_Technikraum", "radon_Werkstatt"]);
+
+const ROH = {};
+for (const [k, r] of Object.entries(DATEN.roh)) ROH[k] = { t: r.t.map(zeitWert), v: r.v };
+function reihe(k) { return ROH[k] || { t: ZEIT, v: DATEN.reihen[k] }; }
+
+// Bei langen Zeiträumen gibt es mehr Stunden als Pixel. Dann werden die Werte zu
+// 3-, 6-, 12- oder 24-Stunden-Mitteln zusammengefasst, damit die Linien lesbar bleiben.
+const ZUSAMMEN = {};
+function gemittelt(k, stunden) {
+  if (stunden <= 1 || ROH[k]) return reihe(k);
+  const schl = k + "|" + stunden;
+  if (!ZUSAMMEN[schl]) {
+    const v = DATEN.reihen[k], t = [], m = [];
+    // Bins an Mitternacht ausrichten (Tagesmittel = Kalendertag)
+    const start = Math.floor(T0 / (stunden * STUNDE)) * stunden * STUNDE;
+    let bin = -1, summe = 0, n = 0;
+    const abschliessen = () => { if (bin >= 0) { t.push(start + (bin + 0.5) * stunden * STUNDE); m.push(n ? summe / n : null); } };
+    for (let i = 0; i < v.length; i++) {
+      const b = Math.floor((ZEIT[i] - start) / (stunden * STUNDE));
+      if (b !== bin) { abschliessen(); bin = b; summe = 0; n = 0; }
+      if (v[i] !== null) { summe += v[i]; n++; }
+    }
+    abschliessen();
+    ZUSAMMEN[schl] = { t: Float64Array.from(t), v: m };
+  }
+  return ZUSAMMEN[schl];
+}
+
+const NAMEN = {
+  g_wohn: "Wohnräume (Ø)", g_keller: "Keller (Ø)",
+  radon_Kueche: "Küche", radon_Wohnzimmer: "Wohnzimmer", radon_Buero: "Büro", radon_Schlafzimmer: "Schlafzimmer",
+  "radon_Kueche - Sockel": "Küche-Sockel", radon_Technikraum: "Technikraum", radon_Werkstatt: "Werkstatt",
+  co2_Kueche: "CO₂ Küche", co2_Schlafzimmer: "CO₂ Schlafzimmer", temp_Kueche: "Temp. Küche", temp_Schlafzimmer: "Temp. Schlafzimmer",
+  temp_Wetter: "Temp. außen", feuchte_Kueche: "Feuchte Küche", feuchte_Schlafzimmer: "Feuchte Schlafzimmer",
+  druck_Kueche: "Druck Küche", druck_Schlafzimmer: "Druck Schlafzimmer", druck_Wetter: "Druck Wetter", wind_Wetter: "Wind",
+  roh_Kueche: "Küche (Rohwerte)",
+};
+// Farbe folgt dem Raum, nie der Position. Die vier Gruppenfarben sind auf Farbenblindheit geprüft.
+const CSS = getComputedStyle(document.documentElement);
+const F = n => CSS.getPropertyValue("--" + n).trim();
+const FARBEN = {
+  g_wohn: F("blau"), g_keller: F("orange"), radon_Schlafzimmer: F("aqua"), "radon_Kueche - Sockel": F("gelb"),
+  radon_Kueche: F("blau"), radon_Wohnzimmer: F("magenta"), radon_Buero: F("gruen"),
+  radon_Technikraum: F("orange"), radon_Werkstatt: F("violett"),
+  co2_Kueche: F("blau"), co2_Schlafzimmer: F("aqua"), temp_Kueche: F("blau"), temp_Schlafzimmer: F("aqua"), temp_Wetter: F("orange"),
+  feuchte_Kueche: F("blau"), feuchte_Schlafzimmer: F("aqua"), druck_Kueche: F("blau"), druck_Schlafzimmer: F("aqua"), druck_Wetter: F("orange"),
+  wind_Wetter: F("violett"), roh_Kueche: F("blau"),
+};
+function einheit(k) {
+  const p = k.split("_")[0];
+  return { radon: "Bq/m³", g: "Bq/m³", roh: "Bq/m³", co2: "ppm", temp: "°C", feuchte: "%", druck: "hPa", wind: "km/h" }[p] || "";
+}
+const WT = ["So", "Mo", "Di", "Mi", "Do", "Fr", "Sa"];
+const zz = n => String(n).padStart(2, "0");
+function datum(ms, mitZeit = true, mitWt = true) {
+  const d = new Date(ms);
+  let s = `${zz(d.getUTCDate())}.${zz(d.getUTCMonth() + 1)}.`;
+  if (mitWt) s = WT[d.getUTCDay()] + " " + s;
+  if (mitZeit) s += ` ${zz(d.getUTCHours())}:${zz(d.getUTCMinutes())}`;
+  return s;
+}
+const zahl = (v, st = 0) => v === null || v === undefined || Number.isNaN(v) ? "–" : Number(v).toLocaleString("de-AT", { minimumFractionDigits: st, maximumFractionDigits: st });
+function mk(tag, klasse, html) { const e = document.createElement(tag); if (klasse) e.className = klasse; if (html !== undefined) e.innerHTML = html; return e; }
+const NS = "http://www.w3.org/2000/svg";
+function suche(arr, x) { let lo = 0, hi = arr.length; while (lo < hi) { const m = (lo + hi) >> 1; if (arr[m] < x) lo = m + 1; else hi = m; } return lo; }
+
+function schoeneTicks(min, max, anzahl) {
+  const roh = (max - min) / Math.max(anzahl, 1);
+  const p = Math.pow(10, Math.floor(Math.log10(roh)));
+  const schritt = [1, 2, 2.5, 5, 10].map(f => f * p).find(s => s >= roh) || 10 * p;
+  const out = [];
+  for (let v = Math.ceil(min / schritt) * schritt; v <= max + 1e-9; v += schritt) out.push(+v.toFixed(10));
+  return out;
+}
+function zeitTicks(von, bis, breite) {
+  const ziel = Math.max(2, Math.floor(breite / 110));
+  const schritte = [STUNDE, 3 * STUNDE, 6 * STUNDE, 12 * STUNDE, TAG, 2 * TAG, 7 * TAG, 14 * TAG, 30 * TAG];
+  const s = schritte.find(x => (bis - von) / x <= ziel) || 30 * TAG;
+  const out = [];
+  if (s === 30 * TAG) {   // Monatsanfänge
+    const d = new Date(von); let t = Date.UTC(d.getUTCFullYear(), d.getUTCMonth() + 1, 1);
+    while (t <= bis) { out.push(t); const e = new Date(t); t = Date.UTC(e.getUTCFullYear(), e.getUTCMonth() + 1, 1); }
+  } else {
+    for (let t = Math.ceil(von / s) * s; t <= bis; t += s) out.push(t);
+  }
+  return { ticks: out, schritt: s };
+}
+
+/* ============================================================
+   Tooltip (gemeinsam für alle Diagramme)
+   ============================================================ */
+function zeigeTip(tip, box, x, y, html) {
+  tip.innerHTML = html; tip.style.opacity = 1;
+  const bw = box.clientWidth, tw = tip.offsetWidth, th = tip.offsetHeight;
+  let lx = x + 16; if (lx + tw > bw) lx = x - tw - 16; if (lx < 0) lx = 0;
+  tip.style.left = lx + "px"; tip.style.top = Math.max(0, y - th / 2) + "px";
+}
+function tipZeile(farbe, name, wert) {
+  return `<div class="zeile"><span class="punkt" style="background:${farbe}"></span>${name}<span class="wert">${wert}</span></div>`;
+}
+
+/* ============================================================
+   Zeitreihen-Diagramm (Linien, Bänder, Grenzwerte, Fadenkreuz)
+   ============================================================ */
+function zeitreihe(el, opt) {
+  const st = { opt: Object.assign({ hoehe: 380, linien: true }, opt), aus: new Set(opt.aus || []) };
+  el.innerHTML = ""; el.classList.add("diagramm");
+  const leg = mk("div", "legende"), box = mk("div", "zeichen"), tip = mk("div", "tooltip");
+  el.append(leg, box); box.append(tip);
+  let svg = null;
+
+  function legendeBauen() {
+    leg.innerHTML = "";
+    leg.hidden = st.opt.reihen.length < 2;
+    for (const k of st.opt.reihen) {
+      const b = mk("button", "leg-eintrag", `<span class="leg-strich" style="background:${FARBEN[k]}"></span>${NAMEN[k] || k}`);
+      b.setAttribute("aria-pressed", String(!st.aus.has(k)));
+      b.onclick = () => { st.aus.has(k) ? st.aus.delete(k) : st.aus.add(k); legendeBauen(); zeichnen(); };
+      leg.append(b);
+    }
+  }
+
+  function zeichnen() {
+    const W = box.clientWidth; if (W < 60) return;
+    const o = st.opt, Hh = o.hoehe, R = { l: 52, r: 14, t: 34, b: 30 };
+    const iw = W - R.l - R.r, ih = Hh - R.t - R.b;
+    // Zusammenfassen, sobald mehr als eine Stunde auf 2,5 Pixel kommt
+    const proPixel = (o.bis - o.von) / STUNDE / iw;
+    const bin = [1, 3, 6, 12, 24].find(b => proPixel / b <= 0.2) || 24;
+    st.bin = bin;
+    const aktiv = o.reihen.filter(k => !st.aus.has(k)).map(k => {
+      const r = gemittelt(k, bin); return { k, r, i0: Math.max(0, suche(r.t, o.von) - 1), i1: Math.min(r.t.length, suche(r.t, o.bis) + 1) };
+    });
+    let ymin = Infinity, ymax = -Infinity;
+    for (const a of aktiv) for (let i = a.i0; i < a.i1; i++) { const v = a.r.v[i]; if (v !== null) { if (v < ymin) ymin = v; if (v > ymax) ymax = v; } }
+    if (!isFinite(ymin)) { ymin = 0; ymax = 1; }
+    const radon = o.reihen.every(k => einheit(k) === "Bq/m³");
+    if (radon || o.ab0) ymin = 0;
+    if (o.ymax) ymax = Math.max(ymax, o.ymax);
+    const grenzen = radon && o.linien ? [{ w: 100, t: "WHO 100", f: F("who") }, { w: 300, t: "Österreich 300", f: F("at") }].filter(g => g.w <= ymax * 1.25 || g.w === 100 && ymax > 55) : [];
+    for (const g of grenzen) ymax = Math.max(ymax, g.w * 1.08);
+    if (ymax - ymin < 1e-6) ymax = ymin + 1;
+    const pad = radon || o.ab0 ? 0 : (ymax - ymin) * 0.08;
+    ymin -= pad; ymax += pad * (radon ? 0 : 1) || (ymax - ymin) * 0.04;
+    const yt = schoeneTicks(ymin, ymax, Math.max(3, Math.floor(ih / 60)));
+    ymin = Math.min(ymin, yt[0]); ymax = Math.max(ymax, yt[yt.length - 1]);
+    const X = t => R.l + (t - o.von) / (o.bis - o.von) * iw;
+    const Y = v => R.t + ih - (v - ymin) / (ymax - ymin) * ih;
+
+    let s = `<svg xmlns="${NS}" width="${W}" height="${Hh}" viewBox="0 0 ${W} ${Hh}" role="img" aria-label="${o.titel || "Zeitreihe"}">`;
+    // Phasen-Bänder
+    for (const b of o.baender || []) {
+      const a = Math.max(o.von, b.von), e = Math.min(o.bis, b.bis); if (e <= a) continue;
+      s += `<rect x="${X(a)}" y="${R.t}" width="${X(e) - X(a)}" height="${ih}" fill="${F("akzent")}" opacity="${b.stark ? .13 : .06}"/>`;
+      if (X(e) - X(a) > 70) s += `<text x="${X(a) + 6}" y="${R.t + 16}" fill="${F("text2")}" font-size="12">${b.text}</text>`;
+    }
+    // Raster + y-Achse
+    for (const v of yt) s += `<line x1="${R.l}" x2="${W - R.r}" y1="${Y(v)}" y2="${Y(v)}" stroke="${F("raster")}"/><text x="${R.l - 8}" y="${Y(v) + 4}" text-anchor="end" fill="${F("leise")}" font-size="12">${zahl(v, Math.abs(yt[1] - yt[0]) < 1 ? 1 : 0)}</text>`;
+    const zt = zeitTicks(o.von, o.bis, iw);
+    for (const t of zt.ticks) {
+      const lbl = zt.schritt < TAG ? `${datum(t, false, false)} ${zz(new Date(t).getUTCHours())}h` : datum(t, false, zt.schritt <= 2 * TAG);
+      s += `<line x1="${X(t)}" x2="${X(t)}" y1="${R.t + ih}" y2="${R.t + ih + 5}" stroke="${F("achse")}"/><text x="${X(t)}" y="${Hh - 8}" text-anchor="middle" fill="${F("leise")}" font-size="12">${lbl}</text>`;
+    }
+    s += `<line x1="${R.l}" x2="${W - R.r}" y1="${R.t + ih}" y2="${R.t + ih}" stroke="${F("achse")}"/>`;
+    s += `<text x="${R.l - 8}" y="14" text-anchor="start" fill="${F("leise")}" font-size="12">${einheit(o.reihen[0])}${bin > 1 ? " · " + (bin === 24 ? "Tagesmittel" : bin + "-Stunden-Mittel") : ""}</text>`;
+    // Grenzwerte
+    // gestrichelt, damit die Grenzwerte nicht mit einer Messreihe ähnlicher Farbe verwechselt werden; weißer Rand macht die Schrift lesbar
+    for (const g of grenzen) s += `<line x1="${R.l}" x2="${W - R.r}" y1="${Y(g.w)}" y2="${Y(g.w)}" stroke="${g.f}" stroke-width="1.4" stroke-dasharray="6 4"/><text x="${W - R.r - 4}" y="${Y(g.w) - 5}" text-anchor="end" fill="${g.f}" font-size="12" font-weight="600" paint-order="stroke" stroke="#fff" stroke-width="4" stroke-linejoin="round">${g.t}</text>`;
+    // Markierungen (z. B. Neustarts)
+    for (const m of o.markierungen || []) if (m >= o.von && m <= o.bis) s += `<line x1="${X(m)}" x2="${X(m)}" y1="${R.t}" y2="${R.t + ih}" stroke="${F("at")}" stroke-width="1.5"/><circle cx="${X(m)}" cy="${R.t + 6}" r="4" fill="${F("at")}"/>`;
+    // Zusatzlinien (z. B. angepasste Kurve)
+    for (const z of o.zusatz || []) {
+      let d = ""; z.t.forEach((t, i) => { if (t >= o.von && t <= o.bis) d += (d ? "L" : "M") + X(t).toFixed(1) + "," + Y(z.v[i]).toFixed(1); });
+      s += `<path d="${d}" fill="none" stroke="${z.farbe}" stroke-width="1.5" opacity=".85"/>`;
+      if (z.text) s += `<text x="${R.l + 8}" y="${Y(z.v[z.v.length - 1]) - 6}" fill="${z.farbe}" font-size="12">${z.text}</text>`;
+    }
+    // Linien; bei Lücken > 2 Messabstände wird abgesetzt (fehlende Daten werden nicht erfunden)
+    for (const a of aktiv) {
+      const abstand = (ROH[a.k] ? 30 * 60e3 : bin * STUNDE) * 2.5;
+      let d = "", vorher = null;
+      for (let i = a.i0; i < a.i1; i++) {
+        const v = a.r.v[i]; if (v === null) { vorher = null; continue; }
+        const t = a.r.t[i];
+        d += (vorher !== null && t - vorher <= abstand ? "L" : "M") + X(t).toFixed(1) + "," + Y(v).toFixed(1);
+        vorher = t;
+      }
+      s += `<path d="${d}" fill="none" stroke="${FARBEN[a.k]}" stroke-width="${aktiv.length > 4 ? 1.4 : 1.8}" stroke-linejoin="round"/>`;
+    }
+    s += `<g class="fk" visibility="hidden"><line class="fk-l" y1="${R.t}" y2="${R.t + ih}" stroke="${F("text2")}" stroke-width="1"/></g>`;
+    s += `<rect class="fl" x="${R.l}" y="${R.t}" width="${iw}" height="${ih}" fill="transparent"/></svg>`;
+    if (svg) svg.remove();
+    box.insertAdjacentHTML("afterbegin", s);
+    svg = box.querySelector("svg");
+    const fk = svg.querySelector(".fk"), fkl = svg.querySelector(".fk-l");
+    const flaeche = svg.querySelector(".fl");
+    function bewegen(ev) {
+      const r = svg.getBoundingClientRect(), x = ev.clientX - r.left;
+      const t = o.von + (x - R.l) / iw * (o.bis - o.von);
+      fk.querySelectorAll("circle").forEach(c => c.remove());
+      const zeilen = [];
+      let tx = null;
+      // Auch wenn die Linie Mittelwerte zeigt, nennt der Tooltip den genauen Zeitpunkt
+      // (Datum + Uhrzeit) und den Stundenwert dort, wo die Maus gerade ist.
+      for (const a of aktiv) {
+        const fein = reihe(a.k), maxAbstand = ROH[a.k] ? 20 * 60e3 : 1.5 * STUNDE;
+        let i = suche(fein.t, t); if (i > 0 && (i >= fein.t.length || Math.abs(fein.t[i - 1] - t) < Math.abs(fein.t[i] - t))) i--;
+        if (i < 0 || i >= fein.t.length) continue;
+        const v = fein.v[i]; if (v === null || Math.abs(fein.t[i] - t) > maxAbstand) continue;
+        if (tx === null) tx = fein.t[i];
+        // Stundenspitzen können über der Achse der Mittelwerte liegen → Punkt am Rand halten
+        const cy = Math.min(Math.max(Y(v), R.t), R.t + ih);
+        const c = document.createElementNS(NS, "circle");
+        c.setAttribute("cx", X(fein.t[i])); c.setAttribute("cy", cy); c.setAttribute("r", 4.5);
+        c.setAttribute("fill", FARBEN[a.k]); c.setAttribute("stroke", "#fff"); c.setAttribute("stroke-width", 2);
+        fk.append(c);
+        zeilen.push([v, tipZeile(FARBEN[a.k], NAMEN[a.k] || a.k, zahl(v, einheit(a.k) === "hPa" ? 2 : 0) + " " + einheit(a.k))]);
+      }
+      if (tx === null) { verlassen(); return; }
+      fkl.setAttribute("x1", X(tx)); fkl.setAttribute("x2", X(tx)); fk.setAttribute("visibility", "visible");
+      zeilen.sort((p, q) => q[0] - p[0]);
+      const hinweis = bin > 1 ? `<div class="hinweis">Stundenwert · Linie zeigt ${bin === 24 ? "Tagesmittel" : bin + "-Stunden-Mittel"}</div>` : "";
+      zeigeTip(tip, box, X(tx), ev.clientY - r.top, `<div class="zeit">${datum(tx)} Uhr</div>` + zeilen.map(z => z[1]).join("") + hinweis);
+    }
+    function verlassen() { fk.setAttribute("visibility", "hidden"); tip.style.opacity = 0; }
+    flaeche.addEventListener("pointermove", bewegen);
+    flaeche.addEventListener("pointerdown", bewegen);
+    flaeche.addEventListener("pointerleave", verlassen);
+  }
+  legendeBauen(); zeichnen();
+  new ResizeObserver(() => zeichnen()).observe(box);
+  return {
+    setze(neu) { Object.assign(st.opt, neu); if (neu.reihen) st.aus = new Set(neu.aus || []); legendeBauen(); zeichnen(); },
+    get svg() { return svg; },
+  };
+}
+
+/* ============================================================
+   Balken-Diagramm (gruppiert, mit Tooltip)
+   ============================================================ */
+function balken(el, opt) {
+  el.innerHTML = ""; el.classList.add("diagramm");
+  const leg = mk("div", "legende"), box = mk("div", "zeichen"), tip = mk("div", "tooltip");
+  el.append(leg, box); box.append(tip);
+  leg.hidden = opt.gruppen.length < 2 || opt.ohneLegende;
+  for (const g of opt.gruppen) leg.append(mk("span", "leg-eintrag", `<span class="leg-strich" style="background:${g.farbe}"></span>${g.name}`));
+  function zeichnen() {
+    const W = box.clientWidth; if (W < 60) return;
+    const Hh = opt.hoehe || 260, R = { l: 46, r: 8, t: 14, b: opt.xTitel ? 46 : 30 };
+    const iw = W - R.l - R.r, ih = Hh - R.t - R.b;
+    const alle = opt.gruppen.flatMap(g => g.werte).filter(v => v !== null);
+    const ymax0 = Math.max(...alle, opt.ymax || 0) * 1.08 || 1;
+    const yt = schoeneTicks(0, ymax0, 4); const ymax = Math.max(ymax0, yt[yt.length - 1]);
+    const Y = v => R.t + ih - v / ymax * ih;
+    const n = opt.kategorien.length, gb = iw / n, ng = opt.gruppen.length;
+    const bb = Math.min(48, (gb * 0.72 - (ng - 1) * 2) / ng);
+    let s = `<svg xmlns="${NS}" width="${W}" height="${Hh}" role="img" aria-label="${opt.titel || "Balkendiagramm"}">`;
+    for (const v of yt) s += `<line x1="${R.l}" x2="${W - R.r}" y1="${Y(v)}" y2="${Y(v)}" stroke="${F("raster")}"/><text x="${R.l - 8}" y="${Y(v) + 4}" text-anchor="end" fill="${F("leise")}" font-size="12">${zahl(v, opt.stellen || 0)}</text>`;
+    opt.kategorien.forEach((kat, i) => {
+      const mitte = R.l + gb * (i + 0.5), start = mitte - (ng * bb + (ng - 1) * 2) / 2;
+      opt.gruppen.forEach((g, j) => {
+        const v = g.werte[i]; if (v === null || v === undefined) return;
+        const x = start + j * (bb + 2), y = Y(v), h = R.t + ih - y, r = Math.min(4, h, bb / 2);
+        s += `<path class="bk" data-i="${i}" data-j="${j}" d="M${x},${R.t + ih} V${y + r} Q${x},${y} ${x + r},${y} H${x + bb - r} Q${x + bb},${y} ${x + bb},${y + r} V${R.t + ih} Z" fill="${g.farbe}"/>`;
+        if (opt.zusatztext && opt.zusatztext[j] && opt.zusatztext[j][i]) s += `<text x="${x + bb / 2}" y="${y - 5}" text-anchor="middle" fill="${F("leise")}" font-size="11">${opt.zusatztext[j][i]}</text>`;
+      });
+      s += `<text x="${mitte}" y="${R.t + ih + 18}" text-anchor="middle" fill="${F("leise")}" font-size="12">${kat}</text>`;
+    });
+    if (opt.xTitel) s += `<text x="${R.l + iw / 2}" y="${Hh - 6}" text-anchor="middle" fill="${F("text2")}" font-size="12">${opt.xTitel}</text>`;
+    s += `<line x1="${R.l}" x2="${W - R.r}" y1="${R.t + ih}" y2="${R.t + ih}" stroke="${F("achse")}"/></svg>`;
+    box.querySelector("svg")?.remove();
+    box.insertAdjacentHTML("afterbegin", s);
+    box.querySelectorAll(".bk").forEach(p => {
+      const zeig = ev => {
+        const i = +p.dataset.i, j = +p.dataset.j, g = opt.gruppen[j], r = box.getBoundingClientRect();
+        box.querySelectorAll(".bk").forEach(q => q.style.opacity = q === p ? 1 : .55);
+        zeigeTip(tip, box, ev.clientX - r.left, ev.clientY - r.top,
+          `<div class="zeit">${opt.kategorien[i]}</div>` + tipZeile(g.farbe, g.name, zahl(g.werte[i], opt.stellen || 0) + " " + (opt.einheit || "")) +
+          (opt.tipExtra ? opt.tipExtra(i, j) : ""));
+      };
+      p.addEventListener("pointermove", zeig); p.addEventListener("pointerdown", zeig);
+      p.addEventListener("pointerleave", () => { tip.style.opacity = 0; box.querySelectorAll(".bk").forEach(q => q.style.opacity = 1); });
+    });
+  }
+  zeichnen(); new ResizeObserver(zeichnen).observe(box);
+}
+
+/* Linien über x = Zahlen (Tagesgang, Lüftungskurve) */
+function linien(el, opt) {
+  el.innerHTML = ""; el.classList.add("diagramm");
+  const box = mk("div", "zeichen"), tip = mk("div", "tooltip"); el.append(box); box.append(tip);
+  function zeichnen() {
+    const W = box.clientWidth; if (W < 60) return;
+    const Hh = opt.hoehe || 220, R = { l: 42, r: 8, t: 10, b: 28 };
+    const iw = W - R.l - R.r, ih = Hh - R.t - R.b;
+    const xs = opt.x, x0 = xs[0], x1 = xs[xs.length - 1];
+    const log = !!opt.log, f = v => log ? Math.log10(v) : v;
+    const [y0, y1] = opt.y;
+    const X = x => R.l + (x - x0) / (x1 - x0) * iw, Y = v => R.t + ih - (f(v) - f(y0)) / (f(y1) - f(y0)) * ih;
+    let s = `<svg xmlns="${NS}" width="${W}" height="${Hh}" role="img" aria-label="${opt.titel || "Liniendiagramm"}">`;
+    for (const v of opt.yTicks) s += `<line x1="${R.l}" x2="${W - R.r}" y1="${Y(v)}" y2="${Y(v)}" stroke="${F("raster")}"/><text x="${R.l - 6}" y="${Y(v) + 4}" text-anchor="end" fill="${F("leise")}" font-size="11">${v}</text>`;
+    for (const v of opt.xTicks) s += `<text x="${X(v)}" y="${Hh - 8}" text-anchor="middle" fill="${F("leise")}" font-size="11">${opt.xFormat ? opt.xFormat(v) : v}</text>`;
+    if (opt.senkrecht !== undefined) s += `<line x1="${X(opt.senkrecht)}" x2="${X(opt.senkrecht)}" y1="${R.t}" y2="${R.t + ih}" stroke="${F("leise")}"/><text x="${X(opt.senkrecht) + 6}" y="${R.t + 14}" fill="${F("leise")}" font-size="11">${opt.senkrechtText || ""}</text>`;
+    for (const r of opt.reihen) {
+      let d = ""; r.werte.forEach((v, i) => { if (v === null || (log && v <= 0)) return; d += (d ? "L" : "M") + X(xs[i]).toFixed(1) + "," + Y(Math.min(Math.max(v, y0), y1)).toFixed(1); });
+      s += `<path d="${d}" fill="none" stroke="${r.farbe}" stroke-width="2"/>`;
+    }
+    s += `<line x1="${R.l}" x2="${W - R.r}" y1="${R.t + ih}" y2="${R.t + ih}" stroke="${F("achse")}"/><line class="fk" y1="${R.t}" y2="${R.t + ih}" stroke="${F("text2")}" visibility="hidden"/>`;
+    s += `<rect class="fl" x="${R.l}" y="${R.t}" width="${iw}" height="${ih}" fill="transparent"/></svg>`;
+    box.querySelector("svg")?.remove(); box.insertAdjacentHTML("afterbegin", s);
+    const svg = box.querySelector("svg"), fk = svg.querySelector(".fk");
+    const bew = ev => {
+      const r = svg.getBoundingClientRect(), xv = x0 + (ev.clientX - r.left - R.l) / iw * (x1 - x0);
+      let i = 0; xs.forEach((x, k) => { if (Math.abs(x - xv) < Math.abs(xs[i] - xv)) i = k; });
+      fk.setAttribute("x1", X(xs[i])); fk.setAttribute("x2", X(xs[i])); fk.setAttribute("visibility", "visible");
+      zeigeTip(tip, box, X(xs[i]), ev.clientY - r.top, `<div class="zeit">${opt.xFormat ? opt.xFormat(xs[i], true) : xs[i]}</div>` +
+        opt.reihen.map(rr => tipZeile(rr.farbe, rr.name, zahl(rr.werte[i], 0) + " " + (opt.einheit || ""))).join(""));
+    };
+    svg.querySelector(".fl").addEventListener("pointermove", bew);
+    svg.querySelector(".fl").addEventListener("pointerdown", bew);
+    svg.querySelector(".fl").addEventListener("pointerleave", () => { fk.setAttribute("visibility", "hidden"); tip.style.opacity = 0; });
+  }
+  zeichnen(); new ResizeObserver(zeichnen).observe(box);
+}
+
+/* Waagrechte Balken mit Beschriftung (für Grenzwerte, Länder) */
+function hbalken(el, zeilen, max) {
+  el.innerHTML = "";
+  for (const z of zeilen) {
+    const r = mk("div", "hb-zeile");
+    r.append(mk("div", "hb-name", z.name));
+    const spur = mk("div", "hb-spur"), b = mk("div", "hb-balken"), w = mk("div", "hb-wert", z.text || zahl(z.wert) + " Bq/m³");
+    const anteil = z.wert / max * 96;
+    b.style.width = anteil + "%"; b.style.background = z.farbe;
+    // Lange Balken: Zahl in den Balken schreiben, damit sie bei schmalem Fenster nicht hinausragt
+    if (anteil > 45) { w.style.right = (100 - anteil) + "%"; w.classList.add("innen"); }
+    else w.style.left = anteil + "%";
+    spur.append(b, w); r.append(spur); el.append(r);
+  }
+}
+
+/* Heatmap Tag × Uhrzeit auf einem Canvas */
+function heatmap(el, k) {
+  el.innerHTML = ""; el.classList.add("diagramm");
+  const box = mk("div", "zeichen"), cv = mk("canvas"), tip = mk("div", "tooltip");
+  const leiste = mk("div", "farbleiste");
+  box.append(cv, tip); el.append(box, leiste);
+  const r = reihe(k), co2 = k.startsWith("co2"), vmin = co2 ? 400 : 0, vmax = co2 ? 1100 : 200;
+  leiste.innerHTML = `<span>${co2 ? "400 ppm" : "0"}</span><span class="verlauf"></span><span>${co2 ? "≥ 1100 ppm" : "≥ 200 Bq/m³"}</span>`;
+  const tag0 = Math.floor(T0 / TAG) * TAG, tage = Math.ceil((ENDE - tag0) / TAG) + 1;
+  const stopps = [[240, 246, 251], [170, 205, 240], [60, 130, 220], [18, 55, 120]];
+  function farbe(v) {
+    const q = Math.min(1, Math.max(0, (v - vmin) / (vmax - vmin))) * (stopps.length - 1), i = Math.min(stopps.length - 2, Math.floor(q)), f = q - i;
+    return `rgb(${stopps[i].map((c, j) => Math.round(c + (stopps[i + 1][j] - c) * f)).join(",")})`;
+  }
+  const R = { l: 40, b: 24, t: 4 };
+  function zeichnen() {
+    const W = box.clientWidth; if (W < 60) return;
+    const Hh = Math.max(220, Math.min(340, W * 0.28)), dpr = window.devicePixelRatio || 1;
+    cv.width = W * dpr; cv.height = Hh * dpr; cv.style.height = Hh + "px";
+    const c = cv.getContext("2d"); c.scale(dpr, dpr);
+    const iw = W - R.l - 6, ih = Hh - R.b - R.t, zw = iw / tage, zh = ih / 24;
+    c.fillStyle = "#f4f6f5"; c.fillRect(R.l, R.t, iw, ih);
+    for (let i = 0; i < r.t.length; i++) {
+      const v = r.v[i]; if (v === null) continue;
+      const d = Math.floor((r.t[i] - tag0) / TAG), h = new Date(r.t[i]).getUTCHours();
+      c.fillStyle = farbe(v); c.fillRect(R.l + d * zw, R.t + (23 - h) * zh, Math.ceil(zw), Math.ceil(zh));
+    }
+    c.fillStyle = F("leise"); c.font = "12px system-ui"; c.textAlign = "right";
+    for (const h of [0, 6, 12, 18]) c.fillText(zz(h) + " h", R.l - 6, R.t + (23 - h) * zh + zh * .8);
+    c.textAlign = "center";
+    for (const t of zeitTicks(tag0, ENDE, iw).ticks) c.fillText(datum(t, false, false), R.l + (t - tag0) / TAG * zw, Hh - 6);
+    cv.onpointermove = ev => {
+      const b = cv.getBoundingClientRect(), x = ev.clientX - b.left, y = ev.clientY - b.top;
+      const d = Math.floor((x - R.l) / zw), h = 23 - Math.floor((y - R.t) / zh);
+      if (d < 0 || d >= tage || h < 0 || h > 23) { tip.style.opacity = 0; return; }
+      const t = tag0 + d * TAG + h * STUNDE, i = suche(r.t, t);
+      const v = r.t[i] === t ? r.v[i] : null;
+      zeigeTip(tip, box, x, y, `<div class="zeit">${datum(t)} Uhr</div>` + tipZeile(farbe(v ?? vmin), NAMEN[k], zahl(v) + " " + einheit(k)));
+    };
+    cv.onpointerleave = () => tip.style.opacity = 0;
+  }
+  zeichnen(); new ResizeObserver(zeichnen).observe(box);
+}
+
+/* ============================================================
+   Inhalte befüllen
+   ============================================================ */
+const E = DATEN.e, Z = E.zeitraeume, UP = E.urlaub_physik;
+const tagMonat = s => `${s.slice(8, 10)}.${s.slice(5, 7)}.`;
+const kuecheMax = Math.max(...DATEN.reihen.radon_Kueche.filter(v => v !== null));
+const morgens = E.lueftungsereignisse.filter(x => { const h = +x.zeit.slice(11, 13); return h >= 5 && h <= 7; }).length;
+// Zahlen für die Fazit-Karten (fehlt etwas in den Daten, steht dort „–“)
+function fazitWerte() {
+  const FZ = E.fazit || {}, wohn = DATEN.reihen.g_wohn.filter(v => v !== null);
+  const mittelWohn = wohn.reduce((a, b) => a + b, 0) / wohn.length;
+  const gl = (UP.radon.Kueche.gleichgewicht + UP.radon.Wohnzimmer.gleichgewicht) / 2;
+  const tg = (E.tagesgang["Frühling: morgens lüften"] || {})["Wohnräume"] || [];
+  const tgMax = Math.max(...tg.filter(v => v !== null)), tgMin = Math.min(...tg.filter(v => v !== null));
+  const d = FZ.druck || {}, an = FZ.anlage || {}, di = FZ.dichtheit || {};
+  return {
+    f_mittel: zahl(mittelWohn), f_risiko_mittel: zahl(RISIKO_PRO_100 * mittelWohn / 100), f_risiko_zu: zahl(RISIKO_PRO_100 * gl / 100),
+    f_lueften: zahl(100 - E.lueften_wirkung.nach_2h_prozent), f_nacht: zahl(tgMax / tgMin, 1), f_nacht_max: zahl(tgMax), f_nacht_min: zahl(tgMin),
+    f_dicht: di.faktor_zu_wenig ? `${zahl(di.faktor_zu_wenig[0])}- bis ${zahl(di.faktor_zu_wenig[1])}` : "–",
+    f_druck_sommer: zahl(d.sommer_pa, 1), f_druck_winter: zahl(d.winter_pa, 0), f_druck_faktor: d.sommer_pa ? zahl(d.winter_pa / d.sommer_pa) : "–",
+    f_hoehe: zahl(d.hoehe_m, 1), f_sensor: zahl(d.sensor_streuung_pa, 1),
+    f_faktor: zahl(FZ.faktor_gemessen, 1), f_heiz: zahl(FZ.heizzeit?.wohn), f_sommer: zahl(FZ.sommer?.wohn),
+    f_anlage_faktor: zahl(an.faktor, 1), f_anlage_kalt: zahl(an.kalt), f_anlage_warm: zahl(an.warm),
+  };
+}
+// Darby et al. 2005: +16 % Lungenkrebs-Risiko pro 100 Bq/m³ Langzeitmittel (linear, ohne Schwelle)
+const RISIKO_PRO_100 = 16;
+const WERTE = {
+  zeilen: zahl(E.datenqualitaet.zeilen), max_kueche: zahl(kuecheMax), anzahl_auff: DATEN.auff.length,
+  luftwechsel: `${zahl(UP.co2.Schlafzimmer.luftwechsel_pro_h * 100)}–${zahl(UP.co2.Kueche.luftwechsel_pro_h * 100)}`,
+  senkung: zahl(E.fairer_vergleich.senkung_proz), lueft_anzahl: E.lueftungsereignisse.length, lueft_2h: zahl(E.lueften_wirkung.nach_2h_prozent),
+  lueft_morgens: E.lueften_wirkung.anzahl, fenster_von: tagMonat(Z.fenster_offen.von), fenster_anteil: zahl(Z.fenster_offen.anteil_offene_naechte),
+  korr_vor: zahl(E.korrelationen.keller_wohn_vor_kwl, 2), korr_nach: zahl(E.korrelationen.keller_wohn_nach_kwl, 2),
+  urlaub_von: tagMonat(Z.urlaub.von), urlaub_bis: tagMonat(Z.urlaub.bis), kwl_ab: tagMonat(Z.kwl.ab),
+  zustrom: zahl((UP.radon.Kueche.zustrom_bq_m3_h + UP.radon.Wohnzimmer.zustrom_bq_m3_h) / 2),
+  gleichgewicht: zahl((UP.radon.Kueche.gleichgewicht + UP.radon.Wohnzimmer.gleichgewicht) / 2, 0),
+  wind_vor: zahl(E.wetter["vor Lüftungsanlage"].regression.pro_10kmh_wind, 1), wind_mit: zahl(E.wetter["mit Lüftungsanlage"].regression.pro_10kmh_wind, 1),
+  druck_vor: (E.wetter["vor Lüftungsanlage"].regression.pro_hpa_druck > 0 ? "+" : "") + zahl(E.wetter["vor Lüftungsanlage"].regression.pro_hpa_druck, 1),
+  druck_mit: (E.wetter["mit Lüftungsanlage"].regression.pro_hpa_druck > 0 ? "+" : "") + zahl(E.wetter["mit Lüftungsanlage"].regression.pro_hpa_druck, 1),
+  dz_max: E.dunstabzug ? zahl(Math.floor(E.dunstabzug.wohn_max / 10) * 10) : "–",  // fehlt, wenn die Daten den 20.07. nicht enthalten
+  ...fazitWerte(),
+  zeitraum: `${tagMonat(E.datenqualitaet.von)} – ${tagMonat(E.datenqualitaet.bis)}2026`,
+};
+document.querySelectorAll("[data-w]").forEach(e => { e.textContent = WERTE[e.dataset.w] ?? "?"; });
+
+// Zerfallskette (SVG)
+(function kette() {
+  const g = document.getElementById("kette");
+  const stoffe = [["U-238", "4,5 Mrd. J."], ["…", ""], ["Ra-226", "1 600 J."], ["Rn-222", "3,8 Tage"], ["Po-218", "3 min"], ["Pb-214", "27 min"], ["Bi-214", "20 min"], ["Po-214", "0,16 ms"], ["Pb-210", "22 J."]];
+  const art = ["α", "", "α", "α", "α", "β", "β", "α"];
+  const breite = 96, abst = 10, x0 = 12;
+  let s = "";
+  stoffe.forEach(([n, hz], i) => {
+    const x = x0 + i * (breite + abst) + (i > 3 ? 16 : 0), y = 70;
+    const gas = n === "Rn-222", lunge = i >= 4 && i <= 7;
+    if (n !== "…") s += `<rect x="${x}" y="${y}" width="${breite}" height="64" rx="10" fill="${gas ? "#fff3d4" : "#ffffff"}" stroke="${gas ? "#c98500" : lunge ? "#d64545" : "#b5c2ba"}" stroke-width="${gas ? 2.5 : 1.5}"/>`;
+    s += `<text x="${x + breite / 2}" y="${y + 30}" fill="#14231a" font-size="${n === "…" ? 26 : 19}" font-weight="700">${n}</text>`;
+    if (hz) s += `<text x="${x + breite / 2}" y="${y + 52}" fill="#5b6b61" font-size="13">${hz}</text>`;
+    if (gas) s += `<text x="${x + breite / 2}" y="${y + 92}" fill="#a06d00" font-size="14" font-weight="600">Gas!</text>`;
+    if (i < stoffe.length - 1) {
+      const xa = x + breite + 1, xb = x0 + (i + 1) * (breite + abst) + (i + 1 > 3 ? 16 : 0) - 1;
+      s += `<line x1="${xa}" y1="${y + 32}" x2="${xb}" y2="${y + 32}" stroke="#898781" stroke-width="2" marker-end="url(#pfeil)"/>`;
+      if (art[i]) s += `<text x="${(xa + xb) / 2}" y="${y + 22}" fill="${art[i] === "α" ? "#d64545" : "#2f6fd0"}" font-size="13" font-weight="700">${art[i]}</text>`;
+    }
+  });
+  s += `<text x="14" y="195" fill="#898781" font-size="14" text-anchor="start">im Boden und Gestein</text>`;
+  g.innerHTML = s;
+  // Punkte im Boden des Haus-Schemas (fester Zufall, damit es immer gleich aussieht)
+  let seed = 7; const zufall = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+  let p = ""; for (let i = 0; i < 70; i++) p += `<circle cx="${zufall() * 760}" cy="${440 + zufall() * 90}" r="${2 + zufall() * 2}"/>`;
+  document.getElementById("bodenpunkte").innerHTML = p;
+})();
+
+// Wissen: Diagramme
+balken(document.getElementById("d-rauch-nicht"), { kategorien: ["0", "100", "400"], gruppen: [{ name: "Nichtraucher", farbe: F("aqua"), werte: [0.4, 0.5, 0.7] }], einheit: "%", stellen: 1, hoehe: 190, titel: "Risiko Nichtraucher" });
+balken(document.getElementById("d-rauch-ja"), { kategorien: ["0", "100", "400"], gruppen: [{ name: "Raucher", farbe: F("orange"), werte: [10, 12, 16] }], einheit: "%", hoehe: 190, titel: "Risiko Raucher" });
+hbalken(document.getElementById("d-grenzwerte"), [
+  { name: "WHO-Empfehlung", wert: 100, farbe: F("who") },
+  { name: "USA (EPA, Handlungswert)", wert: 148, farbe: F("leise") },
+  { name: "Österreich / EU-Höchstwert", wert: 300, farbe: F("at") },
+  { name: "Dieses Haus: Mittel März–Okt. (Küche)", wert: E.kennzahlen.Kueche.gesamt.mittel, farbe: F("blau") },
+  { name: "Dieses Haus: Urlaub, alles zu", wert: UP.radon.Kueche.gleichgewicht, farbe: F("blau"), text: "≈ " + zahl(UP.radon.Kueche.gleichgewicht) + " Bq/m³ (Gleichgewicht)" },
+  { name: "Dieses Haus: höchster Stundenwert", wert: kuecheMax, farbe: F("blau") },
+], kuecheMax);
+hbalken(document.getElementById("d-europa"), [
+  { name: "Großbritannien, Niederlande", wert: 23, farbe: F("blau"), text: "20–23 Bq/m³" },
+  { name: "Österreich (ÖNRAP)", wert: 99, farbe: F("aqua"), text: "99 Bq/m³" },
+  { name: "Tschechien, Finnland, Estland", wert: 120, farbe: F("orange"), text: "118–120 Bq/m³" },
+  { name: "Dieses Haus (Ø Wohnräume, März–Okt.)", wert: E.kennzahlen.Kueche.gesamt.mittel, farbe: F("leise") },
+], 160);
+
+/* ============================================================
+   Weltkugel: orthografische Projektion auf einem Canvas
+   Jeder Punkt (Länge λ, Breite φ) wird um die Blickrichtung gedreht und
+   von vorne betrachtet. z < 0 heißt: Punkt liegt auf der Rückseite. Solche
+   Punkte werden an den Rand der Kugel geschoben, damit Länder, die halb
+   hinter dem Horizont liegen, sauber am Rand enden.
+   ============================================================ */
+(function () {
+  const W = DATEN.welt, cv = document.getElementById("globus-canvas");
+  const box = cv.parentElement, tip = box.querySelector(".tooltip");
+  const info = document.getElementById("globus-info");
+  if (!W) { box.innerHTML = '<p class="leise">Die Kartendaten (welt/laender_110m.json) fehlen, deshalb gibt es hier keine Weltkugel.</p>'; window.__globus = { anzahl: 0, laender: [] }; return; }
+  const GRAD = Math.PI / 180;
+  const ruhig = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const st = { lon: 14, lat: 35, ziel: null, zieht: false, selbst: !ruhig, sichtbar: true, hover: null, auswahl: "040", gezeichnet: 0 };
+  const laender = W.laender;
+  // Farbskala: blassgelb (wenig) → orange → rot (viel); grau = keine Daten
+  const stopps = [[10, [255, 243, 196]], [50, [246, 196, 83]], [100, [232, 131, 58]], [150, [192, 57, 43]]];
+  function farbe(v) {
+    if (v === null) return "#dfe5e1";
+    if (v <= stopps[0][0]) return `rgb(${stopps[0][1]})`;
+    for (let i = 1; i < stopps.length; i++) if (v <= stopps[i][0]) {
+      const [a, fa] = stopps[i - 1], [b, fb] = stopps[i], t = (v - a) / (b - a);
+      return `rgb(${fa.map((c, j) => Math.round(c + (fb[j] - c) * t)).join(",")})`;
+    }
+    return `rgb(${stopps[stopps.length - 1][1]})`;
+  }
+  let groesse = 0, dpr = 1, pfade = [];
+  function projiziere(lon, lat, R, c) {
+    const l = (lon - st.lon) * GRAD, f = lat * GRAD, f0 = st.lat * GRAD, cf = Math.cos(f);
+    let x = cf * Math.sin(l), y = Math.cos(f0) * Math.sin(f) - Math.sin(f0) * cf * Math.cos(l);
+    const z = Math.sin(f0) * Math.sin(f) + Math.cos(f0) * cf * Math.cos(l);
+    if (z < 0) { const n = Math.hypot(x, y) || 1; x /= n; y /= n; }
+    return [c + R * x, c - R * y, z >= 0];
+  }
+  function zeichnen() {
+    const w = box.clientWidth; if (w < 60) return;
+    if (w !== groesse) { groesse = w; dpr = window.devicePixelRatio || 1; cv.width = w * dpr; cv.height = w * dpr; }
+    const c = cv.getContext("2d"), R = groesse / 2 - 6, m = groesse / 2;
+    c.setTransform(dpr, 0, 0, dpr, 0, 0); c.clearRect(0, 0, groesse, groesse);
+    // Meer mit leichtem Licht von links oben
+    const g = c.createRadialGradient(m - R * .35, m - R * .35, R * .1, m, m, R);
+    g.addColorStop(0, "#ffffff"); g.addColorStop(1, "#d6e8f2");
+    c.beginPath(); c.arc(m, m, R, 0, 2 * Math.PI); c.fillStyle = g; c.fill();
+    // Gradnetz alle 30°
+    c.strokeStyle = "rgba(40,90,120,.12)"; c.lineWidth = 1;
+    for (let lon = -180; lon < 180; lon += 30) { c.beginPath(); let an = false; for (let lat = -90; lat <= 90; lat += 3) { const [x, y, s] = projiziere(lon, lat, R, m); if (s) { an ? c.lineTo(x, y) : c.moveTo(x, y); an = true; } else an = false; } c.stroke(); }
+    for (let lat = -60; lat <= 60; lat += 30) { c.beginPath(); let an = false; for (let lon = -180; lon <= 180; lon += 3) { const [x, y, s] = projiziere(lon, lat, R, m); if (s) { an ? c.lineTo(x, y) : c.moveTo(x, y); an = true; } else an = false; } c.stroke(); }
+    // Länder
+    pfade = [];
+    for (const land of laender) {
+      const pfad = new Path2D(); let sichtbar = false;
+      for (const r of land.r) {
+        let ringSichtbar = false; const pts = [];
+        for (let i = 0; i < r.length; i += 2) { const p = projiziere(r[i], r[i + 1], R, m); pts.push(p); if (p[2]) ringSichtbar = true; }
+        if (!ringSichtbar) continue;
+        sichtbar = true; pts.forEach(([x, y], i) => i ? pfad.lineTo(x, y) : pfad.moveTo(x, y)); pfad.closePath();
+      }
+      if (!sichtbar) continue;
+      c.fillStyle = farbe(land.v); c.fill(pfad, "evenodd");
+      c.strokeStyle = "rgba(255,255,255,.9)"; c.lineWidth = .6; c.stroke(pfad);
+      pfade.push([land, pfad]);
+    }
+    // Hervorhebung: ausgewähltes und überfahrenes Land
+    for (const [land, pfad] of pfade) if (land.id === st.auswahl || land === st.hover) { c.strokeStyle = land === st.hover ? "#14231a" : F("akzent-dunkel"); c.lineWidth = 2; c.stroke(pfad); }
+    c.beginPath(); c.arc(m, m, R, 0, 2 * Math.PI); c.strokeStyle = "rgba(20,70,40,.18)"; c.lineWidth = 1; c.stroke();
+    st.gezeichnet = pfade.length;
+  }
+  function landBei(ev) {
+    const b = cv.getBoundingClientRect(), x = (ev.clientX - b.left) * dpr, y = (ev.clientY - b.top) * dpr;
+    const c = cv.getContext("2d");
+    for (let i = pfade.length - 1; i >= 0; i--) if (c.isPointInPath(pfade[i][1], x, y, "evenodd")) return pfade[i][0];
+    return null;
+  }
+  const wertText = l => l.v === null ? "keine Daten" : zahl(l.v) + " Bq/m³";
+  function zeigeInfo(land) {
+    if (!land) return;
+    st.auswahl = land.id;
+    info.innerHTML = `<span class="zahl" style="color:${land.v === null ? F("leise") : land.v >= 100 ? F("at") : F("text")}">${land.v === null ? "–" : zahl(land.v)}</span>` +
+      `<span><span class="name">${land.n}</span><br><span class="leise klein">${land.v === null ? "keine Daten in der Quelle" : "Bq/m³ im Mittel" + (land.h ? " · " + land.h : "")}</span></span>`;
+  }
+  // Rangliste: die 6 höchsten und 6 niedrigsten Länder mit Wert
+  const mitWert = laender.filter(l => l.v !== null).sort((a, b) => b.v - a.v);
+  const liste = document.getElementById("globus-liste");
+  liste.innerHTML = `<div class="titel">Am meisten</div><div class="titel">Am wenigsten</div>` +
+    [0, 1, 2, 3, 4, 5].map(i => { const h = mitWert[i], n = mitWert[mitWert.length - 1 - i]; return `<div><span>${h.n}</span><b>${h.v}</b></div><div><span>${n.n}</span><b>${n.v}</b></div>`; }).join("");
+  document.getElementById("globus-quelle").textContent = `${mitWert.length} Länder mit Wert. Quelle: ${W.quelle}; Österreich: ${W.quelle_at}. Weltmittel: ${W.weltmittel} Bq/m³. Erhebungen aus verschiedenen Jahren, deshalb nur als Größenordnung vergleichbar.`;
+  zeigeInfo(laender.find(l => l.id === "040"));
+
+  // Bedienung: Ziehen dreht, Zeigen zeigt den Wert, Knöpfe drehen zu einem Ziel
+  let start = null;
+  cv.addEventListener("pointerdown", ev => { start = { x: ev.clientX, y: ev.clientY, lon: st.lon, lat: st.lat, weg: 0 }; st.zieht = true; st.selbst = false; st.ziel = null; cv.setPointerCapture(ev.pointerId); cv.classList.add("zieht"); });
+  cv.addEventListener("pointermove", ev => {
+    if (start) {
+      const k = 180 / (groesse || 400);   // eine Kugelbreite ziehen = halbe Umdrehung
+      start.weg = Math.hypot(ev.clientX - start.x, ev.clientY - start.y);
+      st.lon = start.lon - (ev.clientX - start.x) * k; st.lat = Math.max(-80, Math.min(80, start.lat + (ev.clientY - start.y) * k));
+      tip.style.opacity = 0; zeichnen(); return;
+    }
+    const land = landBei(ev); st.hover = land; zeichnen();
+    if (!land) { tip.style.opacity = 0; return; }
+    const b = box.getBoundingClientRect();
+    zeigeTip(tip, box, ev.clientX - b.left, ev.clientY - b.top, `<div class="zeit">${land.n}</div>` + tipZeile(farbe(land.v), "Radon in Wohnungen", wertText(land)) + (land.h ? `<div class="hinweis">${land.h}</div>` : ""));
+  });
+  function loslassen(ev) {
+    if (start && start.weg < 5) zeigeInfo(landBei(ev));     // kurzer Klick/Tipp = Land auswählen
+    start = null; st.zieht = false; cv.classList.remove("zieht"); zeichnen();
+  }
+  cv.addEventListener("pointerup", loslassen);
+  cv.addEventListener("pointercancel", () => { start = null; st.zieht = false; cv.classList.remove("zieht"); });
+  cv.addEventListener("pointerleave", () => { st.hover = null; tip.style.opacity = 0; zeichnen(); });
+  document.querySelectorAll("#globus-knoepfe button").forEach(k => k.onclick = () => {
+    const [lon, lat] = k.dataset.ziel.split(",").map(Number); st.ziel = { lon, lat }; st.selbst = false;
+    if (k.dataset.land) zeigeInfo(laender.find(l => l.id === k.dataset.land));
+    if (ruhig) { st.lon = lon; st.lat = lat; st.ziel = null; zeichnen(); }
+  });
+  // Animation: langsam von selbst drehen, bis man die Kugel anfasst; nur wenn sie zu sehen ist
+  new IntersectionObserver(e => { st.sichtbar = e[0].isIntersecting; }).observe(cv);
+  function schritt() {
+    if (st.sichtbar && !st.zieht) {
+      if (st.ziel) {
+        let d = ((st.ziel.lon - st.lon + 540) % 360) - 180;   // kürzester Weg um die Kugel
+        st.lon += d * .12; st.lat += (st.ziel.lat - st.lat) * .12;
+        if (Math.abs(d) < .1 && Math.abs(st.ziel.lat - st.lat) < .1) st.ziel = null;
+        zeichnen();
+      } else if (st.selbst && !st.hover) { st.lon += .12; zeichnen(); }
+    }
+    requestAnimationFrame(schritt);
+  }
+  zeichnen(); new ResizeObserver(zeichnen).observe(box); requestAnimationFrame(schritt);
+  window.__globus = { anzahl: laender.length, mitWert: mitWert.length, get gezeichnet() { return st.gezeichnet; }, get lon() { return st.lon; }, zeigeInfo, laender, cv };
+})();
+
+// Phasen-Bänder für Zeitreihen
+const BAENDER = [
+  { von: zeitWert(Z.fenster_offen.von), bis: zeitWert(Z.kwl.ab), text: "Fenster offen" },
+  { von: zeitWert(Z.urlaub.von), bis: zeitWert(Z.urlaub.bis), text: "Urlaub", stark: true },
+  { von: zeitWert(Z.kwl.ab), bis: ENDE, text: "Lüftungsanlage" },
+];
+const GRUPPEN = ["g_wohn", "g_keller", "radon_Schlafzimmer", "radon_Kueche - Sockel"];
+// Reihenfolge = Reihenfolge der geprüften Palette (benachbarte Farben gut unterscheidbar)
+const RAEUME = ["radon_Kueche", "radon_Technikraum", "radon_Schlafzimmer", "radon_Kueche - Sockel", "radon_Wohnzimmer", "radon_Buero", "radon_Werkstatt"];
+
+// Gesamtdiagramm mit Phasen-Knöpfen
+const PHASEN = [
+  ["Alles", T0, ENDE], ["Messbeginn", T0, zeitWert("2026-04-05")], ["Frühling", zeitWert("2026-03-31"), zeitWert(Z.fenster_offen.von)],
+  ["Fenster offen", zeitWert(Z.fenster_offen.von), zeitWert(Z.urlaub.von)], ["Urlaub", zeitWert(Z.urlaub.von) - 2 * TAG, zeitWert(Z.urlaub.bis) + 2 * TAG],
+  ["Lüftungsanlage", zeitWert(Z.kwl.ab) - 10 * TAG, ENDE],
+];
+const gesamt = zeitreihe(document.getElementById("d-gesamt"), { reihen: GRUPPEN, von: T0, bis: ENDE, baender: BAENDER, hoehe: 440, titel: "Radon im ganzen Haus" });
+const pk = document.getElementById("phasen-knoepfe");
+PHASEN.forEach(([n, a, b], i) => {
+  const k = mk("button", "", n); k.setAttribute("aria-pressed", String(i === 0));
+  k.onclick = () => { pk.querySelectorAll("button").forEach(x => x.setAttribute("aria-pressed", String(x === k))); gesamt.setze({ von: a, bis: b }); };
+  pk.append(k);
+});
+document.querySelectorAll("#ansicht-knoepfe button").forEach(k => k.onclick = () => {
+  document.querySelectorAll("#ansicht-knoepfe button").forEach(x => x.setAttribute("aria-pressed", String(x === k)));
+  gesamt.setze({ reihen: k.dataset.ansicht === "gruppen" ? GRUPPEN : RAEUME });
+});
+
+// Kapitel 1: Tagesgang je Phase (kleine Vielfache mit gleicher Achse)
+(function () {
+  const el = document.getElementById("d-tagesgang");
+  for (const [phase, tg] of Object.entries(E.tagesgang)) {
+    const fach = mk("div"); fach.append(mk("div", "titel", phase)); const d = mk("div"); fach.append(d); el.append(fach);
+    linien(d, {
+      x: [...Array(24).keys()], xTicks: [0, 6, 12, 18], xFormat: (v, lang) => lang ? `${zz(v)}:00 Uhr` : v + " h", log: true, y: [8, 450], yTicks: [10, 20, 50, 100, 200, 400], einheit: "Bq/m³",
+      reihen: [{ name: "Wohnräume", farbe: F("blau"), werte: tg["Wohnräume"] }, { name: "Keller", farbe: F("orange"), werte: tg["Keller"] }, { name: "Schlafzimmer", farbe: F("aqua"), werte: tg["Schlafzimmer"] }],
+      hoehe: 210, titel: "Tagesgang " + phase,
+    });
+  }
+  const leg = mk("div", "legende"); leg.style.gridColumn = "1/-1";
+  [["Wohnräume", "blau"], ["Keller", "orange"], ["Schlafzimmer", "aqua"]].forEach(([n, f]) => leg.append(mk("span", "leg-eintrag", `<span class="leg-strich" style="background:${F(f)}"></span>${n}`)));
+  el.prepend(leg);
+})();
+linien(document.getElementById("d-lueftkurve"), {
+  x: E.lueften_wirkung.kurve_stunden, xTicks: [-3, 0, 3, 6, 9, 12], xFormat: (v, lang) => lang ? (v >= 0 ? "+" : "") + zahl(v, 1) + " h" : v + " h",
+  y: [0, 105], yTicks: [0, 25, 50, 75, 100], einheit: "%", senkrecht: 0, senkrechtText: "Fenster auf",
+  reihen: [{ name: "Radon (Wohnräume)", farbe: F("blau"), werte: E.lueften_wirkung.kurve_prozent }], hoehe: 240, titel: "Lüftungskurve",
+});
+(function () {
+  const z = Array(24).fill(0); E.lueftungsereignisse.forEach(x => z[+x.zeit.slice(11, 13)]++);
+  balken(document.getElementById("d-lueftzeit"), { kategorien: z.map((_, i) => i % 3 === 0 ? String(i) : ""), gruppen: [{ name: "Lüftungsereignisse", farbe: F("blau"), werte: z }], einheit: "mal", hoehe: 240, xTitel: "Uhrzeit", titel: "Uhrzeit der Lüftungen",
+    tipExtra: i => `<div class="leise">${zz(i)}:00–${zz(i)}:59 Uhr</div>` });
+})();
+
+// Kapitel 2–4: Zoom-Diagramme
+zeitreihe(document.getElementById("d-sommer"), { reihen: ["g_wohn", "g_keller"], von: zeitWert("2026-06-15"), bis: zeitWert(Z.urlaub.von), baender: BAENDER, hoehe: 360 });
+(function () {
+  const a = zeitWert(Z.urlaub.von), b = zeitWert(Z.urlaub.bis);
+  // angepasste Kurve der Küche: C(t) = Cgl + (C0 − Cgl)·e^(−(n+λ)t)
+  const k = UP.radon.Kueche, kk = k.luftwechsel_pro_h + ZERFALL, t0 = a + 2 * STUNDE, tt = [], vv = [];
+  for (let t = t0; t <= b; t += STUNDE) { tt.push(t); vv.push(k.gleichgewicht + (k.start - k.gleichgewicht) * Math.exp(-kk * (t - t0) / STUNDE)); }
+  zeitreihe(document.getElementById("d-urlaub-rn"), { reihen: ["g_wohn", "g_keller", "radon_Schlafzimmer", "radon_Kueche - Sockel"], von: a - TAG, bis: b + 1.5 * TAG,
+    baender: [{ von: a, bis: b, text: "Urlaub", stark: true }], zusatz: [{ t: tt, v: vv, farbe: F("text"), text: "" }], hoehe: 340 });
+  zeitreihe(document.getElementById("d-urlaub-co2"), { reihen: ["co2_Kueche", "co2_Schlafzimmer"], von: a - TAG, bis: b + 1.5 * TAG, baender: [{ von: a, bis: b, text: "Urlaub", stark: true }], hoehe: 260 });
+  const kach = document.getElementById("urlaub-kacheln");
+  [[zahl((b - a) / TAG, 1), "Tage", "niemand zu Hause"],
+   [WERTE.luftwechsel, "% / h", "Luftwechsel (aus CO₂)"],
+   [zahl(UP.radon.Kueche.luftwechsel_pro_h * 100, 1), "% / h", "Luftwechsel (aus Radon, Küche)"],
+   [WERTE.zustrom, "Bq/m³/h", "Zustrom aus dem Boden"],
+   [WERTE.gleichgewicht, "Bq/m³", "Gleichgewicht ohne Lüften"]].forEach(([z, e, t]) =>
+    kach.append(mk("div", "kachel", `<div class="zahl">${z}<small>${e}</small></div><div class="text">${t}</div>`)));
+})();
+zeitreihe(document.getElementById("d-kwl"), { reihen: ["g_wohn", "g_keller", "radon_Kueche - Sockel"], von: zeitWert(Z.kwl.ab) - 10 * TAG, bis: zeitWert(Z.kwl.ab) + 12 * TAG, baender: BAENDER, hoehe: 340 });
+(function () {
+  const tab = E.fairer_vergleich.tabelle, kl = [...new Set(tab.map(r => r.aussen))];
+  const w = g => kl.map(k => (tab.find(r => r.aussen === k && r.gruppe === g) || {}).radon_wohn ?? null);
+  const n = g => kl.map(k => (tab.find(r => r.aussen === k && r.gruppe === g) || {}).naechte ?? null);
+  balken(document.getElementById("d-fair"), {
+    kategorien: kl.map(k => "außen " + k), gruppen: [{ name: "ohne Anlage", farbe: F("orange"), werte: w("ohne Anlage") }, { name: "mit Anlage", farbe: F("blau"), werte: w("mit Anlage") }],
+    einheit: "Bq/m³", hoehe: 300, zusatztext: [n("ohne Anlage").map(x => x ? x + " N." : ""), n("mit Anlage").map(x => x ? x + " N." : "")], titel: "Fairer Vergleich",
+    tipExtra: (i, j) => `<div class="leise">${[n("ohne Anlage"), n("mit Anlage")][j][i]} Nächte</div>`,
+  });
+})();
+
+// Kapitel 5: Ursachen
+(function () {
+  const el = document.getElementById("d-kamin");
+  // Gleiche y-Achse in beiden Feldern, sonst wirkt der kleinere Wert größer
+  const gemeinsamMax = Math.max(...["vor Lüftungsanlage", "mit Lüftungsanlage"].flatMap(t => [...E.wetter[t].dT.wohn, ...E.wetter[t].dT.keller]).filter(v => v !== null));
+  for (const teil of ["vor Lüftungsanlage", "mit Lüftungsanlage"]) {
+    const d = E.wetter[teil].dT, f = mk("div"); f.append(mk("div", "titel klein", teil)); const c = mk("div"); f.append(c); el.append(f);
+    balken(c, { kategorien: d.klassen.map(k => k.replace(" bis ", "…")), gruppen: [{ name: "Wohnräume", farbe: F("blau"), werte: d.wohn }, { name: "Keller", farbe: F("orange"), werte: d.keller }],
+      einheit: "Bq/m³", hoehe: 260, xTitel: "innen − außen in °C", titel: "Kamineffekt " + teil, ymax: gemeinsamMax, tipExtra: i => `<div class="leise">${d.stunden[i]} Stunden</div>` });
+  }
+  // Vorher/nachher als zwei Reihen; Farben wie im fairen Vergleich (ohne = orange, mit = blau)
+  const v = E.wetter["vor Lüftungsanlage"], m = E.wetter["mit Lüftungsanlage"];
+  for (const [id, gr, titel] of [["d-wind", "wind", "Wind in km/h"], ["d-druck", "dp12", "Druckänderung in hPa (12 h)"]])
+    balken(document.getElementById(id), { kategorien: v[gr].klassen.map(k => k.replace(" bis ", "…")), einheit: "Bq/m³", hoehe: 230, xTitel: titel, titel,
+      gruppen: [{ name: "ohne Anlage", farbe: F("orange"), werte: v[gr].wohn }, { name: "mit Anlage", farbe: F("blau"), werte: m[gr].wohn }],
+      tipExtra: (i, j) => `<div class="leise">${[v, m][j][gr].stunden[i]} Stunden</div>` });
+  heatmap(document.getElementById("d-heatmap"), "g_wohn");
+  document.querySelectorAll("#hm-knoepfe button").forEach(k => k.onclick = () => {
+    document.querySelectorAll("#hm-knoepfe button").forEach(x => x.setAttribute("aria-pressed", String(x === k)));
+    heatmap(document.getElementById("d-heatmap"), k.dataset.k);
+  });
+})();
+
+// Rechner: Gleichgewicht = Zustrom / (Luftwechsel + Zerfall)
+(function () {
+  const rn = document.getElementById("r-n"), rs = document.getElementById("r-s");
+  const nAusRegler = x => 0.01 * Math.pow(200, x / 1000);           // logarithmisch 0,01 … 2 pro Stunde
+  const reglerAusN = n => Math.round(Math.log(n / 0.01) / Math.log(200) * 1000);
+  rs.value = Math.round(parseFloat(WERTE.zustrom.replace(",", ".")) * 2) / 2;
+  rn.value = reglerAusN(0.02);
+  function rechne() {
+    const n = nAusRegler(+rn.value), s = +rs.value, c = s / (n + ZERFALL);
+    document.getElementById("o-n").textContent = zahl(n * 100, n < 0.1 ? 1 : 0) + " % pro h";
+    document.getElementById("o-s").textContent = zahl(s, 1) + " Bq/m³ pro h";
+    document.getElementById("r-ergebnis").textContent = zahl(c);
+    const st = document.getElementById("r-status");
+    if (c > 300) { st.textContent = "über dem Referenzwert 300"; st.style.color = F("at"); st.style.background = "rgba(208,59,59,.12)"; }
+    else if (c > 100) { st.textContent = "über der WHO-Empfehlung 100"; st.style.color = F("who"); st.style.background = "rgba(250,178,25,.12)"; }
+    else { st.textContent = "unter der WHO-Empfehlung"; st.style.color = F("gut"); st.style.background = "rgba(12,163,12,.12)"; }
+  }
+  rn.oninput = rs.oninput = rechne;
+  document.querySelectorAll("#r-vorlagen button").forEach(b => b.onclick = () => { rn.value = reglerAusN(+b.dataset.n); rechne(); });
+  rechne();
+})();
+
+// Teil 3: Auffälligkeiten mit Lupe
+(function () {
+  const lupe = zeitreihe(document.getElementById("d-lupe"), { reihen: ["g_wohn"], von: T0, bis: ENDE, baender: BAENDER, hoehe: 360 });
+  const karten = document.getElementById("auff-karten"), filter = document.getElementById("auff-filter");
+  const KAT = { Verhalten: "Verhalten & Maßnahmen", Haus: "Haus & Räume", Daten: "Datenqualität" };
+  function zeige(a, karte, scrollen) {
+    karten.querySelectorAll(".auff").forEach(k => k.setAttribute("aria-current", String(k === karte)));
+    const von = zeitWert(a.zeige_von || a.von), bis = a.zeige_bis ? zeitWert(a.zeige_bis) : (a.bis.length > 10 ? zeitWert(a.bis) : zeitWert(a.bis) + TAG);
+    lupe.setze({ reihen: a.reihen, von, bis, markierungen: (a.markierungen || []).map(zeitWert) });
+    document.getElementById("lupe-nr").textContent = a.nr;
+    document.getElementById("lupe-titel").textContent = a.titel;
+    document.getElementById("lupe-zeit").textContent = `${datum(von, a.von.length > 10, false)} bis ${datum(bis, a.bis.length > 10, false)} · ${KAT[a.kategorie]}`;
+    document.getElementById("lupe-was").innerHTML = "<b>Was man sieht:</b> " + a.was;
+    document.getElementById("lupe-warum").innerHTML = "<b>Erklärung:</b> " + a.warum;
+    const link = document.getElementById("lupe-link");
+    link.hidden = !a.diagramm; if (a.diagramm) link.href = "#" + a.diagramm;
+    if (scrollen && window.innerWidth <= 1100) document.getElementById("lupe").scrollIntoView({ behavior: "smooth" });
+  }
+  DATEN.auff.forEach(a => {
+    const k = mk("button", "auff", `<span class="nr">${a.nr}</span><span class="t">${a.titel}<span class="kat">${a.kategorie}</span></span><span class="z">${tagMonat(a.von)}${a.von.slice(0, 10) !== a.bis.slice(0, 10) ? " – " + tagMonat(a.bis) : ""}</span>`);
+    k.dataset.kat = a.kategorie; k.onclick = () => zeige(a, k, true); karten.append(k);
+  });
+  ["Alle", "Verhalten", "Haus", "Daten"].forEach((n, i) => {
+    const b = mk("button", "", n === "Alle" ? `Alle (${DATEN.auff.length})` : `${KAT[n]} (${DATEN.auff.filter(a => a.kategorie === n).length})`);
+    b.setAttribute("aria-pressed", String(i === 0));
+    b.onclick = () => { filter.querySelectorAll("button").forEach(x => x.setAttribute("aria-pressed", String(x === b))); karten.querySelectorAll(".auff").forEach(k => k.hidden = n !== "Alle" && k.dataset.kat !== n); };
+    filter.append(b);
+  });
+  zeige(DATEN.auff[0], karten.firstChild, false);
+  window.__lupe = { zeige, karten };
+})();
+
+// Wissen: Antworten sind anfangs zu. Der Knopf klappt alle auf bzw. wieder zu.
+(function () {
+  const knopf = document.getElementById("alle-auf");
+  const fragen = () => [...document.querySelectorAll("#wissen .fragen details.frage")];
+  function beschriften() { knopf.textContent = fragen().every(d => d.open) ? "Alle Antworten zuklappen" : "Alle Antworten aufklappen"; }
+  knopf.onclick = () => { const auf = !fragen().every(d => d.open); fragen().forEach(d => d.open = auf); beschriften(); };
+  fragen().forEach(d => d.addEventListener("toggle", beschriften));
+})();
+
+// Navigation: aktiver Abschnitt + Fortschrittsbalken
+(function () {
+  const links = [...document.querySelectorAll("nav.oben .links a")];
+  const bereiche = links.map(a => document.querySelector(a.getAttribute("href")));
+  function pruefe() {
+    const y = window.scrollY + 120; let akt = -1;
+    bereiche.forEach((b, i) => { if (b.offsetTop <= y) akt = i; });
+    links.forEach((a, i) => a.classList.toggle("aktiv", i === akt));
+    const h = document.documentElement.scrollHeight - innerHeight;
+    document.getElementById("fortschritt").style.width = (h > 0 ? scrollY / h * 100 : 0) + "%";
+  }
+  addEventListener("scroll", pruefe, { passive: true }); pruefe();
+})();
+
+// ?zu=<id> springt ohne Animation zu einem Abschnitt (für Screenshots und direkte Links)
+const ZU = new URLSearchParams(location.search).get("zu");
+if (ZU && document.getElementById(ZU)) {
+  document.documentElement.style.scrollBehavior = "auto";
+  if (new URLSearchParams(location.search).has("bild")) {
+    // Screenshot-Modus: alles vor dem Ziel ausblenden, damit es ohne Scrollen oben steht
+    for (let e = document.getElementById(ZU); e && e !== document.body; e = e.parentElement)
+      for (let v = e.previousElementSibling; v; v = v.previousElementSibling) if (!v.matches("nav, script, .blasen")) v.style.display = "none";
+  } else requestAnimationFrame(() => document.getElementById(ZU).scrollIntoView());
+}
+
+/* ============================================================
+   Testmodus: radon.html?test schreibt einen Prüfbericht in #testbericht
+   ============================================================ */
+if (location.search.includes("test")) {
+  const pruef = [];
+  const ok = (name, bed, info = "") => pruef.push({ name, ok: !!bed, info });
+  // Vor dem Aufklappen: Die Wissens-Fragen müssen anfangs zu sein
+  const wissen = [...document.querySelectorAll("#wissen details.frage")];
+  ok("Wissen anfangs zugeklappt", wissen.length >= 11 && wissen.every(d => !d.open), wissen.filter(d => d.open).length + " offen");
+  // Aufklappen, damit auch die Diagramme in den Antworten gezeichnet werden (ResizeObserver braucht einen Moment)
+  document.getElementById("alle-auf").click();
+  ok("Knopf klappt alle auf", wissen.filter(d => d.closest(".fragen")).every(d => d.open));
+  setTimeout(testRest, 300);
+  function testRest() {
+  ok("Daten geladen", ANZ > 1000, ANZ + " Stunden");
+  ok("Alle Zeiträume erkannt", Z.urlaub && Z.fenster_offen && Z.kwl);
+  const ids = ["d-gesamt", "d-tagesgang", "d-lueftkurve", "d-lueftzeit", "d-sommer", "d-urlaub-rn", "d-urlaub-co2", "d-kwl", "d-fair", "d-kamin", "d-wind", "d-druck", "d-lupe", "d-rauch-nicht", "d-rauch-ja"];
+  for (const id of ids) {
+    const el = document.getElementById(id), pfade = el ? [...el.querySelectorAll("svg path")].filter(p => (p.getAttribute("d") || "").length > 20) : [];
+    ok("Diagramm " + id, pfade.length > 0, pfade.length + " Pfade");
+  }
+  ok("Heatmap gezeichnet", document.querySelector("#d-heatmap canvas")?.width > 0);
+  ok("Zerfallskette gezeichnet", document.querySelectorAll("#kette rect").length >= 8);
+  ok("Auffälligkeiten-Karten", document.querySelectorAll(".auff").length === DATEN.auff.length, DATEN.auff.length + " Karten");
+  ok("Platzhalter befüllt", [...document.querySelectorAll("[data-w]")].every(e => e.textContent && e.textContent !== "?" && !e.textContent.includes("NaN")));
+  ok("Kein NaN/undefined im Text", !/NaN|undefined/.test(document.body.innerText));
+  // Lupe für jede Auffälligkeit durchklicken
+  let lupeOk = true;
+  DATEN.auff.forEach((a, i) => { window.__lupe.zeige(a, window.__lupe.karten.children[i], false); if (!document.querySelector("#d-lupe svg") || document.getElementById("lupe-titel").textContent !== a.titel) lupeOk = false; });
+  ok("Lupe zeigt alle Auffälligkeiten", lupeOk);
+  // Rechner: Urlaubswert muss das gemessene Gleichgewicht ungefähr treffen
+  document.querySelector('#r-vorlagen button[data-n="0.02"]').click();
+  const rw = parseFloat(document.getElementById("r-ergebnis").textContent.replace(/\./g, "").replace(",", "."));
+  ok("Rechner plausibel", rw > 250 && rw < 450, rw + " Bq/m³");
+  // Tooltip in der Gesamtansicht (Tagesmittel) muss trotzdem Datum UND Uhrzeit zeigen
+  const fl = document.querySelector("#d-gesamt .fl"), rb = fl.getBoundingClientRect();
+  fl.dispatchEvent(new PointerEvent("pointermove", { clientX: rb.left + rb.width * 0.55, clientY: rb.top + rb.height / 2, bubbles: true }));
+  const tipText = document.querySelector("#d-gesamt .tooltip .zeit")?.textContent || "";
+  ok("Tooltip mit Uhrzeit", /\d\d\.\d\d\. \d\d:\d\d Uhr/.test(tipText), tipText);
+  ok("Dunstabzug-Wert vorhanden", E.dunstabzug && E.dunstabzug.zustrom_bq_m3_h > E.dunstabzug.zustrom_urlaub, E.dunstabzug && E.dunstabzug.zustrom_bq_m3_h + " gegen " + E.dunstabzug.zustrom_urlaub);
+  ok("Weltkugel gezeichnet", window.__globus.anzahl > 150 && window.__globus.gezeichnet > 20, window.__globus.gezeichnet + " von " + window.__globus.anzahl + " Ländern sichtbar");
+  const at = window.__globus.laender.find(l => l.id === "040");
+  ok("Österreich auf der Weltkugel", at && at.v === 99 && document.getElementById("globus-info").textContent.includes("Österreich"));
+  // Ziehen simulieren: Die Kugel muss sich danach gedreht haben
+  if (window.__globus.cv) {
+    const g = window.__globus, gb = g.cv.getBoundingClientRect(), vorher = g.lon;
+    const ev = (typ, dx) => new PointerEvent(typ, { clientX: gb.left + gb.width / 2 + dx, clientY: gb.top + gb.height / 2, pointerId: 1, bubbles: true });
+    try { g.cv.dispatchEvent(ev("pointerdown", 0)); g.cv.dispatchEvent(ev("pointermove", -120)); g.cv.dispatchEvent(ev("pointerup", -120)); } catch (e) { FEHLER.push(String(e)); }
+    ok("Weltkugel lässt sich drehen", Math.abs(g.lon - vorher) > 20, zahl(vorher, 0) + "° → " + zahl(g.lon, 0) + "°");
+  }
+  ok("Fazit-Zahlen befüllt", [...document.querySelectorAll("#fazit [data-w]")].every(e => e.textContent && e.textContent !== "–" && e.textContent !== "?"));
+  ok("Keine JavaScript-Fehler", FEHLER.length === 0, FEHLER.join(" | "));
+  // Elemente, die rechts über den Bildschirm hinausragen (ohne die waagrecht scrollbare Navigation)
+  const zuBreit = [...document.querySelectorAll("body *")].filter(e => !e.closest("nav, #testbericht") && e.getBoundingClientRect().right > innerWidth + 1 && e.getBoundingClientRect().width > 0)
+    .filter((e, _, alle) => !alle.some(a => a !== e && e.contains(a))).slice(0, 6)
+    .map(e => (e.id ? "#" + e.id : e.tagName.toLowerCase() + "." + [...e.classList].join(".")) + " " + Math.round(e.getBoundingClientRect().right));
+  ok("Kein waagrechtes Scrollen", document.documentElement.scrollWidth <= innerWidth + 1, document.documentElement.scrollWidth + " / " + innerWidth + " " + zuBreit.join(", "));
+  const alle = pruef.every(p => p.ok);
+  document.getElementById("testbericht").textContent = JSON.stringify({ ergebnis: alle ? "OK" : "FEHLER", pruefungen: pruef }, null, 1);
+  document.title = (alle ? "TEST OK – " : "TEST FEHLER – ") + document.title;
+  window.__lupe.zeige(DATEN.auff[0], window.__lupe.karten.children[0], false);
+  }
+}
+</script>
+</body>
+</html>

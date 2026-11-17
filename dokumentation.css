@@ -1,0 +1,9 @@
+/* Grüner Akzent passend zur Website */
+:root { --gruen: #0b7a42; }
+a { color: var(--gruen); }
+h1.title { color: #14231a; }
+h2 { border-bottom: 2px solid #e2efe6; padding-bottom: .2em; margin-top: 1.6em; }
+strong { color: #14231a; }
+.callout.callout-style-default { border-left-color: #13a05a !important; }
+img { border-radius: 8px; box-shadow: 0 6px 20px rgba(20,70,40,.10); }
+table { font-size: .95rem; }
